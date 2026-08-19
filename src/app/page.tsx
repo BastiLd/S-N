@@ -1,6 +1,12 @@
 import Link from 'next/link';
 import { WolkenBand, Regen, Tornado, Huegel, Sterne, PfotenSymbol, PfotenPaar } from '@/components/Himmel';
 import { TAILSCALE_ADRESSE, HEIM_ADRESSE, VETNOW_WEB } from '@/lib/zugaenge';
+import { pfad } from '@/lib/pfad';
+import medien from '@/data/medien.json';
+
+/* Ein Foto als Hintergrund fuer den Gedenk-Abschnitt. Ist es (noch)
+   nicht da, bleibt der Abschnitt einfach der Sternenhimmel. */
+const BRUECKENBILD = 'img_20170608_140304';
 
 const BRANCHES = [
   {
@@ -30,6 +36,8 @@ const BRANCHES = [
 ];
 
 export default function Start() {
+  const bruecke = medien.bilder.find((b) => b.id === BRUECKENBILD);
+
   return (
     <>
       {/* ================= Hero ================= */}
@@ -180,6 +188,13 @@ export default function Start() {
       {/* ================= Brücke zur Gedenkseite ================= */}
       <section className="bruecke">
         <Sterne anzahl={90} saat={771} klasse="bruecke-sterne" />
+        {bruecke && (
+          <div
+            className="bruecke-foto"
+            aria-hidden="true"
+            style={{ backgroundImage: `url(${pfad(bruecke.vorschau)})` }}
+          />
+        )}
         <div className="wrap bruecke-inhalt">
           <PfotenPaar breite={84} />
           <h2 style={{ marginTop: 24 }}>Für Simba und Nala</h2>

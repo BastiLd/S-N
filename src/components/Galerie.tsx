@@ -1,17 +1,52 @@
 'use client';
 
+/* Galerie mit Grossansicht.  © Bastian Klaus */
+
 import { useCallback, useEffect, useState } from 'react';
 import { pfad } from '@/lib/pfad';
 
 export type Stueck = {
   art: 'bild' | 'video';
   datei: string;
+  id: string;
   pfad: string;
+  vorschau: string;
+  breite: number | null;
+  hoehe: number | null;
   text: string;
+  gross?: boolean;
 };
 
-/* Galerie mit Lightbox. Bedienbar per Maus und per Tastatur:
-   Pfeiltasten blaettern, Escape schliesst. */
+/* Im Raster steht immer nur ein Standbild — auch bei Videos. Sonst
+   wuerde der Browser saemtliche Videodateien anlesen, nur um Kacheln
+   zu zeigen. Das <video> entsteht erst in der Grossansicht. */
+function Kachel({ s, onOeffnen, eigenesMass = false }:
+  { s: Stueck; onOeffnen: () => void; eigenesMass?: boolean }) {
+  /* Hervorgehobene Bilder behalten ihr echtes Seitenverhaeltnis und
+     werden nicht beschnitten. Die kleinen Kacheln im Raster laufen alle
+     auf 3:4 — das gibt saubere Reihen, und das ungeschnittene Bild ist
+     ohnehin einen Klick entfernt. */
+  const verhaeltnis = eigenesMass && s.breite && s.hoehe ? `${s.breite} / ${s.hoehe}` : undefined;
+  return (
+    <button
+      className="stueck"
+      style={verhaeltnis ? { aspectRatio: verhaeltnis } : undefined}
+      onClick={onOeffnen}
+      aria-label={s.art === 'video' ? `${s.text} — Video abspielen` : `${s.text} — groß ansehen`}
+    >
+      <img src={pfad(s.vorschau)} alt={s.text} loading="lazy" decoding="async" />
+      {s.art === 'video' && (
+        <span className="stueck-play" aria-hidden="true">
+          <svg width="17" height="17" viewBox="0 0 12 12" fill="currentColor">
+            <path d="M2.4 1.2 L10.4 6 L2.4 10.8 Z" />
+          </svg>
+        </span>
+      )}
+      <span className="stueck-text">{s.text}</span>
+    </button>
+  );
+}
+
 export function Galerie({ stuecke }: { stuecke: Stueck[] }) {
   const [offen, setOffen] = useState<number | null>(null);
 
@@ -29,7 +64,7 @@ export function Galerie({ stuecke }: { stuecke: Stueck[] }) {
       else if (e.key === 'ArrowLeft') weiter(-1);
     };
     window.addEventListener('keydown', taste);
-    /* Hintergrund nicht mitscrollen lassen, solange die Lightbox offen ist */
+    /* Hintergrund nicht mitscrollen lassen, solange die Grossansicht offen ist */
     const vorher = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     return () => {
@@ -39,42 +74,35 @@ export function Galerie({ stuecke }: { stuecke: Stueck[] }) {
   }, [offen, weiter]);
 
   if (stuecke.length === 0) return null;
-
   const aktuell = offen === null ? null : stuecke[offen];
+
+  /* Hervorgehobene Bilder bekommen eine eigene, breite Reihe. Der Rest
+     laeuft darunter als gleichmaessiges Raster. */
+  const hervor = stuecke.map((s, i) => ({ s, i })).filter(({ s }) => s.gross);
+  const rest = stuecke.map((s, i) => ({ s, i })).filter(({ s }) => !s.gross);
 
   return (
     <>
-      <div className="galerie">
-        {stuecke.map((s, i) => (
-          <button
-            key={s.pfad}
-            /* Jedes vierte Stueck darf breiter stehen — das bricht das
-               starre Raster auf, ohne dass etwas ausgerichtet werden muss. */
-            className={'stueck' + (i % 7 === 0 ? ' gross' : '')}
-            onClick={() => setOffen(i)}
-            aria-label={`${s.text} — gross ansehen`}
-          >
-            {s.art === 'bild' ? (
-              <img src={pfad(s.pfad)} alt={s.text} loading="lazy" decoding="async" />
-            ) : (
-              <>
-                <video src={pfad(s.pfad)} muted playsInline preload="metadata" />
-                <span className="stueck-play" aria-hidden="true">
-                  <svg width="13" height="13" viewBox="0 0 12 12" fill="currentColor">
-                    <path d="M2 1.2 L10.4 6 L2 10.8 Z" />
-                  </svg>
-                </span>
-              </>
-            )}
-            <span className="stueck-text">{s.text}</span>
-          </button>
-        ))}
-      </div>
+      {hervor.length > 0 && (
+        <div className="galerie-gross">
+          {hervor.map(({ s, i }) => (
+            <Kachel key={s.pfad} s={s} onOeffnen={() => setOffen(i)} eigenesMass />
+          ))}
+        </div>
+      )}
+
+      {rest.length > 0 && (
+        <div className="galerie">
+          {rest.map(({ s, i }) => (
+            <Kachel key={s.pfad} s={s} onOeffnen={() => setOffen(i)} />
+          ))}
+        </div>
+      )}
 
       {aktuell && (
         <div className="lb" role="dialog" aria-modal="true" aria-label={aktuell.text}
              onClick={() => setOffen(null)}>
-          <button className="lb-zu" onClick={() => setOffen(null)} aria-label="Schliessen">
+          <button className="lb-zu" onClick={() => setOffen(null)} aria-label="Schließen">
             <svg width="19" height="19" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
               <path d="M4 4 L16 16 M16 4 L4 16" />
             </svg>
@@ -91,7 +119,7 @@ export function Galerie({ stuecke }: { stuecke: Stueck[] }) {
               </button>
               <button className="lb-pfeil rechts"
                       onClick={(e) => { e.stopPropagation(); weiter(1); }}
-                      aria-label="Naechstes">
+                      aria-label="Nächstes">
                 <svg width="19" height="19" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M7.5 4 L14 10 L7.5 16" />
                 </svg>
@@ -103,9 +131,19 @@ export function Galerie({ stuecke }: { stuecke: Stueck[] }) {
             {aktuell.art === 'bild' ? (
               <img src={pfad(aktuell.pfad)} alt={aktuell.text} />
             ) : (
-              <video src={pfad(aktuell.pfad)} controls autoPlay playsInline />
+              /* key erzwingt ein frisches <video> beim Weiterblaettern —
+                 sonst behaelt der Player die alte Quelle. */
+              <video
+                key={aktuell.pfad}
+                src={pfad(aktuell.pfad)}
+                poster={pfad(aktuell.vorschau)}
+                controls autoPlay playsInline preload="auto"
+              />
             )}
-            <p className="lb-text">{aktuell.text}</p>
+            <p className="lb-text">
+              {aktuell.text}
+              <span className="lb-zaehler">{(offen ?? 0) + 1} / {stuecke.length} · © Bastian Klaus</span>
+            </p>
           </div>
         </div>
       )}

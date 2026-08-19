@@ -8,3 +8,7 @@ next-env.d.ts
 .DS_Store
 Thumbs.db
 *.log
+
+# Originaldateien vom Handy - kommen nicht ins Repository,
+# sondern gehen durch `npm run aufbereiten`.
+roh/

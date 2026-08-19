@@ -9,6 +9,11 @@ export const metadata: Metadata = {
   },
   description:
     'Projekte rund um tierärztliche Soforthilfe in Kärnten — und eine Gedenkseite für Simba und Nala.',
+  authors: [{ name: 'Bastian Klaus' }],
+  creator: 'Bastian Klaus',
+  publisher: 'Bastian Klaus',
+  /* Steht als <meta name="copyright"> im Kopf jeder Seite. */
+  other: { copyright: '© Bastian Klaus — Alle Rechte vorbehalten' },
   openGraph: {
     title: 'S-N — Simba & Nala',
     description:

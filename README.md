@@ -32,24 +32,39 @@ externen Dienste — alle Animationen sind CSS und SVG.
 
 ## Bilder und Videos einbauen
 
+Originaldateien vom Handy nach `roh/` legen und einmal:
+
+```bash
+npm run aufbereiten
+```
+
+Ein anderer Quellordner geht auch:
+
+```bash
+npm run aufbereiten -- "C:/Users/basti/Music/Vid Img"
+```
+
+Das Skript rechnet alles auf web-taugliche Formate um und legt es an:
+
 ```
 public/medien/
-├── bilder/   ← .jpg .jpeg .png .webp .avif .gif
-└── videos/   ← .mp4 .webm .mov .m4v
+├── bilder/     .webp, max. 2400 px
+├── videos/     .mp4 (H.264/AAC), max. 1080p, faststart
+├── vorschau/   ein Vorschaubild je Datei — bei Videos ein Standbild
+└── masse.json  Seitenverhältnisse fürs Raster
 ```
 
-Dateien hineinlegen, committen, pushen. Mehr nicht. Beim Bauen liest
-`scripts/medien.mjs` beide Ordner aus und schreibt `src/data/medien.json`;
-die Gedenkseite zeigt anschließend alles an.
+**Warum nicht einfach die Originale?** Genau daran sind die Videos zuerst
+gescheitert: `.MOV` ist ein QuickTime-Container, den Firefox nicht
+abspielt, iPhone-4K ist **HEVC** und läuft in *keinem* Browser, und
+1,3 GB pro Datei nimmt GitHub ohnehin nicht an (Grenze: 100 MB). Nebenbei
+werden EXIF-Daten entfernt — sonst steckt der GPS-Standort in den Fotos,
+und die Seite ist öffentlich.
 
-- **Reihenfolge** über führende Zahlen im Dateinamen (`01-…`, `02-…`).
-  Die Zahl wird in der Anzeige wieder abgeschnitten.
-- **Eigene Bildunterschriften** über eine `bildtexte.json` im jeweiligen
-  Ordner: `{ "01-simba.jpg": "Text unter dem Bild" }`.
-- Details stehen in [`public/medien/LIES-MICH.md`](public/medien/LIES-MICH.md).
-
-Größen: Fotos möglichst unter 2 MB, Videos unter 50 MB. Über 100 MB nimmt
-GitHub die Datei gar nicht erst an.
+Wo ein Bild landet und was darunter steht, regelt
+[`src/data/kuration.ts`](src/data/kuration.ts). Nicht eingetragene
+Dateien landen automatisch unter „Alles andere". Details in
+[`public/medien/LIES-MICH.md`](public/medien/LIES-MICH.md).
 
 ---
 

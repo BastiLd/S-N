@@ -344,6 +344,16 @@ p  { margin: 0; line-height: 1.65; text-wrap: pretty; }
 .bruecke .btn { margin-top: 34px; }
 .bruecke-sterne { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
 
+/* Ein Foto hinter dem Gedenk-Abschnitt — stark abgedunkelt und an den
+   Raendern ausgeblendet, damit es Stimmung macht und nicht Bild ist. */
+.bruecke-foto {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background-size: cover; background-position: center 32%;
+  opacity: .2; filter: saturate(.7) contrast(1.05);
+  -webkit-mask-image: radial-gradient(120% 88% at 50% 46%, #000 12%, transparent 72%);
+          mask-image: radial-gradient(120% 88% at 50% 46%, #000 12%, transparent 72%);
+}
+
 /* ============================================================
    Kopf- und Fusszeile
    ============================================================ */
@@ -385,6 +395,13 @@ p  { margin: 0; line-height: 1.65; text-wrap: pretty; }
 .fuss ul { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 8px; }
 .fuss .titel { color: var(--hell); font-weight: 700; font-size: 14.5px; }
 .fuss-unten { margin-top: 34px; padding-top: 22px; border-top: 1px solid rgba(255,255,255,.09); font-size: 13px; }
+.fuss-unten .copyright { color: var(--hell-2); font-size: 13.5px; }
+.fuss-unten .copyright strong { color: var(--hell); letter-spacing: .01em; }
+
+/* Rechtehinweis unter der Galerie */
+.galerie-fuss .rechte {
+  display: block; margin-top: 8px; font-size: 12.5px; color: var(--hell-3); opacity: .85;
+}
 
 /* ============================================================
    GEDENKSEITE
@@ -461,30 +478,77 @@ p  { margin: 0; line-height: 1.65; text-wrap: pretty; }
   70%      { transform: scale(.95, 1.07) rotate(-2deg); opacity: .9; }
 }
 
+/* Kopfbild oben auf der Gedenkseite */
+.kopfbild {
+  position: relative; z-index: 1;
+  margin: clamp(34px, 5vw, 56px) auto 0; max-width: 860px;
+  border-radius: var(--r-xl); overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, .14);
+  box-shadow: 0 34px 90px rgba(0, 0, 0, .5);
+  background: rgba(255, 255, 255, .04);
+}
+.kopfbild img { width: 100%; height: auto; display: block; }
+.kopfbild figcaption {
+  padding: 14px 20px 16px; font-size: 14.5px; color: var(--hell-3);
+  text-align: center; background: rgba(6, 9, 26, .55);
+}
+
+/* Abschnitte der Gedenkseite */
+.gruppe { position: relative; z-index: 1; margin-top: clamp(60px, 8vw, 96px); }
+.gruppe:last-of-type { margin-bottom: 20px; }
+
+.galerie-fuss {
+  position: relative; z-index: 1;
+  margin: 34px auto clamp(70px, 10vw, 120px); text-align: center;
+  font-size: 13.5px; color: var(--hell-3);
+}
+
 /* Galerie */
-.galerie-kopf { position: relative; z-index: 1; margin-top: clamp(66px, 9vw, 110px); text-align: center; }
+.galerie-kopf { position: relative; z-index: 1; margin-top: 0; text-align: center; }
 .galerie-kopf .eyebrow { color: var(--gold); }
 .galerie-kopf h2 { margin-top: 12px; color: var(--hell); }
 .galerie-kopf p  { margin: 14px auto 0; max-width: 52ch; color: var(--hell-3); }
 
+/* Hervorgehobene Bilder: eigene Reihe, echtes Seitenverhaeltnis, nicht
+   beschnitten. Bewusst schmal gehalten — ueber die volle Breite wird ein
+   Hochformat sonst ueber 1000 px hoch und erschlaegt alles andere. */
+.galerie-gross {
+  position: relative; z-index: 1;
+  margin-top: 30px;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 420px));
+  justify-content: center;
+  gap: 16px; align-items: start;
+}
+@media (max-width: 620px) { .galerie-gross { grid-template-columns: 1fr; gap: 10px; } }
+
+/* Das Raster darunter: alle Kacheln 3:4, damit die Reihen sauber
+   durchlaufen. Beschnitten wird nur die Vorschau — ein Klick zeigt das
+   ganze Bild. */
 .galerie {
   position: relative; z-index: 1;
-  margin-top: 40px; padding-bottom: clamp(70px, 10vw, 120px);
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(232px, 1fr));
-  gap: 16px;
+  margin-top: 16px;
+  /* auto-fit statt auto-fill: leere Spalten fallen weg. Die Obergrenze
+     verhindert, dass vier Bilder auf 350 px aufgeblasen werden. */
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 250px));
+  justify-content: center;
+  gap: 14px;
 }
+.galerie .stueck { aspect-ratio: 3 / 4; }
+@media (max-width: 620px) { .galerie { grid-template-columns: repeat(2, 1fr); gap: 10px; } }
 .stueck {
   position: relative; overflow: hidden; border-radius: var(--r-lg);
   border: 1px solid rgba(255, 255, 255, .12);
   background: rgba(255, 255, 255, .04);
-  aspect-ratio: 4 / 3;
+  /* aspect-ratio setzt die Kachel selbst — aus den echten Bildmassen.
+     Hochformate wurden vorher auf 4:3 beschnitten, da war von der Katze
+     regelmaessig der Kopf ab. */
   cursor: zoom-in; padding: 0; display: block; width: 100%; text-align: left;
   transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
 }
 .stueck:hover { transform: translateY(-4px) scale(1.012); border-color: rgba(246,201,122,.5);
                 box-shadow: 0 24px 54px rgba(0, 0, 0, .45); }
 .stueck:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
-.stueck img, .stueck video { width: 100%; height: 100%; object-fit: cover; }
+.stueck img { width: 100%; height: 100%; object-fit: cover; object-position: center 35%; display: block; }
 .stueck-text {
   position: absolute; left: 0; right: 0; bottom: 0;
   padding: 26px 15px 13px; font-size: 13.5px; font-weight: 600; color: #fff;
@@ -496,8 +560,11 @@ p  { margin: 0; line-height: 1.65; text-wrap: pretty; }
   background: rgba(6, 9, 26, .6); backdrop-filter: blur(6px);
   display: grid; place-items: center; color: #fff;
 }
-.stueck.gross { grid-column: span 2; aspect-ratio: 16 / 10; }
-@media (max-width: 560px) { .stueck.gross { grid-column: span 1; aspect-ratio: 4 / 3; } }
+/* Zaehler in der Grossansicht */
+.lb-zaehler {
+  display: block; margin-top: 6px; font-size: 12.5px;
+  color: var(--hell-3); font-variant-numeric: tabular-nums;
+}
 
 /* Leerer Zustand */
 .leer {

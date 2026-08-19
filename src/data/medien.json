@@ -1,5 +1,217 @@
 {
-  "erzeugt": "2026-08-19T12:03:44.116Z",
-  "bilder": [],
-  "videos": []
+  "erzeugt": "2026-08-19T14:30:47.726Z",
+  "bilder": [
+    {
+      "art": "bild",
+      "datei": "img_3902.webp",
+      "id": "img_3902",
+      "pfad": "/medien/bilder/img_3902.webp",
+      "vorschau": "/medien/vorschau/bilder/img_3902.webp",
+      "breite": 800,
+      "hoehe": 600,
+      "text": "img 3902"
+    },
+    {
+      "art": "bild",
+      "datei": "img_3911.webp",
+      "id": "img_3911",
+      "pfad": "/medien/bilder/img_3911.webp",
+      "vorschau": "/medien/vorschau/bilder/img_3911.webp",
+      "breite": 600,
+      "hoehe": 800,
+      "text": "img 3911"
+    },
+    {
+      "art": "bild",
+      "datei": "img_3913.webp",
+      "id": "img_3913",
+      "pfad": "/medien/bilder/img_3913.webp",
+      "vorschau": "/medien/vorschau/bilder/img_3913.webp",
+      "breite": 600,
+      "hoehe": 800,
+      "text": "img 3913"
+    },
+    {
+      "art": "bild",
+      "datei": "img_3927.webp",
+      "id": "img_3927",
+      "pfad": "/medien/bilder/img_3927.webp",
+      "vorschau": "/medien/vorschau/bilder/img_3927.webp",
+      "breite": 600,
+      "hoehe": 800,
+      "text": "img 3927"
+    },
+    {
+      "art": "bild",
+      "datei": "img_3929.webp",
+      "id": "img_3929",
+      "pfad": "/medien/bilder/img_3929.webp",
+      "vorschau": "/medien/vorschau/bilder/img_3929.webp",
+      "breite": 600,
+      "hoehe": 800,
+      "text": "img 3929"
+    },
+    {
+      "art": "bild",
+      "datei": "img_3931.webp",
+      "id": "img_3931",
+      "pfad": "/medien/bilder/img_3931.webp",
+      "vorschau": "/medien/vorschau/bilder/img_3931.webp",
+      "breite": 600,
+      "hoehe": 800,
+      "text": "img 3931"
+    },
+    {
+      "art": "bild",
+      "datei": "img_3932.webp",
+      "id": "img_3932",
+      "pfad": "/medien/bilder/img_3932.webp",
+      "vorschau": "/medien/vorschau/bilder/img_3932.webp",
+      "breite": 600,
+      "hoehe": 800,
+      "text": "img 3932"
+    },
+    {
+      "art": "bild",
+      "datei": "img_4101.webp",
+      "id": "img_4101",
+      "pfad": "/medien/bilder/img_4101.webp",
+      "vorschau": "/medien/vorschau/bilder/img_4101.webp",
+      "breite": 800,
+      "hoehe": 450,
+      "text": "img 4101"
+    },
+    {
+      "art": "bild",
+      "datei": "img_4408.webp",
+      "id": "img_4408",
+      "pfad": "/medien/bilder/img_4408.webp",
+      "vorschau": "/medien/vorschau/bilder/img_4408.webp",
+      "breite": 800,
+      "hoehe": 600,
+      "text": "img 4408"
+    },
+    {
+      "art": "bild",
+      "datei": "img_4414.webp",
+      "id": "img_4414",
+      "pfad": "/medien/bilder/img_4414.webp",
+      "vorschau": "/medien/vorschau/bilder/img_4414.webp",
+      "breite": 600,
+      "hoehe": 800,
+      "text": "img 4414"
+    },
+    {
+      "art": "bild",
+      "datei": "img_4420.webp",
+      "id": "img_4420",
+      "pfad": "/medien/bilder/img_4420.webp",
+      "vorschau": "/medien/vorschau/bilder/img_4420.webp",
+      "breite": 600,
+      "hoehe": 800,
+      "text": "img 4420"
+    },
+    {
+      "art": "bild",
+      "datei": "img_4421.webp",
+      "id": "img_4421",
+      "pfad": "/medien/bilder/img_4421.webp",
+      "vorschau": "/medien/vorschau/bilder/img_4421.webp",
+      "breite": 600,
+      "hoehe": 800,
+      "text": "img 4421"
+    },
+    {
+      "art": "bild",
+      "datei": "img_20170608_140220.webp",
+      "id": "img_20170608_140220",
+      "pfad": "/medien/bilder/img_20170608_140220.webp",
+      "vorschau": "/medien/vorschau/bilder/img_20170608_140220.webp",
+      "breite": 600,
+      "hoehe": 800,
+      "text": "img 20170608 140220"
+    },
+    {
+      "art": "bild",
+      "datei": "img_20170608_140304.webp",
+      "id": "img_20170608_140304",
+      "pfad": "/medien/bilder/img_20170608_140304.webp",
+      "vorschau": "/medien/vorschau/bilder/img_20170608_140304.webp",
+      "breite": 800,
+      "hoehe": 800,
+      "text": "img 20170608 140304"
+    }
+  ],
+  "videos": [
+    {
+      "art": "video",
+      "datei": "img_3893.mp4",
+      "id": "img_3893",
+      "pfad": "/medien/videos/img_3893.mp4",
+      "vorschau": "/medien/vorschau/videos/img_3893.webp",
+      "breite": 800,
+      "hoehe": 450,
+      "text": "img 3893"
+    },
+    {
+      "art": "video",
+      "datei": "img_3902.mp4",
+      "id": "img_3902",
+      "pfad": "/medien/videos/img_3902.mp4",
+      "vorschau": "/medien/vorschau/videos/img_3902.webp",
+      "breite": 800,
+      "hoehe": 600,
+      "text": "img 3902"
+    },
+    {
+      "art": "video",
+      "datei": "img_3917.mp4",
+      "id": "img_3917",
+      "pfad": "/medien/videos/img_3917.mp4",
+      "vorschau": "/medien/vorschau/videos/img_3917.webp",
+      "breite": 800,
+      "hoehe": 1422,
+      "text": "img 3917"
+    },
+    {
+      "art": "video",
+      "datei": "img_20170531_182425.mp4",
+      "id": "img_20170531_182425",
+      "pfad": "/medien/videos/img_20170531_182425.mp4",
+      "vorschau": "/medien/vorschau/videos/img_20170531_182425.webp",
+      "breite": 800,
+      "hoehe": 1422,
+      "text": "img 20170531 182425"
+    },
+    {
+      "art": "video",
+      "datei": "img_20170605_174423.mp4",
+      "id": "img_20170605_174423",
+      "pfad": "/medien/videos/img_20170605_174423.mp4",
+      "vorschau": "/medien/vorschau/videos/img_20170605_174423.webp",
+      "breite": 800,
+      "hoehe": 450,
+      "text": "img 20170605 174423"
+    },
+    {
+      "art": "video",
+      "datei": "img_20170605_174528.mp4",
+      "id": "img_20170605_174528",
+      "pfad": "/medien/videos/img_20170605_174528.mp4",
+      "vorschau": "/medien/vorschau/videos/img_20170605_174528.webp",
+      "breite": 800,
+      "hoehe": 450,
+      "text": "img 20170605 174528"
+    },
+    {
+      "art": "video",
+      "datei": "img_20170605_175051.mp4",
+      "id": "img_20170605_175051",
+      "pfad": "/medien/videos/img_20170605_175051.mp4",
+      "vorschau": "/medien/vorschau/videos/img_20170605_175051.webp",
+      "breite": 800,
+      "hoehe": 1422,
+      "text": "img 20170605 175051"
+    }
+  ]
 }

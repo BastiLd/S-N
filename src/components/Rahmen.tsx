@@ -63,8 +63,15 @@ export function Fuss() {
         </div>
 
         <div className="fuss-unten">
-          Alle Praxisdaten in den Apps sind Platzhalter-Testdaten. Keine
-          medizinische Beratung — im Notfall bitte immer direkt anrufen.
+          <p className="copyright">
+            © {new Date().getFullYear()} <strong>Bastian Klaus</strong>. Alle Rechte vorbehalten.
+            Fotos, Videos und Code dieser Seite dürfen nicht ohne Rücksprache
+            weiterverwendet werden.
+          </p>
+          <p style={{ marginTop: 10 }}>
+            Alle Praxisdaten in den Apps sind Platzhalter-Testdaten. Keine
+            medizinische Beratung — im Notfall bitte immer direkt anrufen.
+          </p>
         </div>
       </div>
     </footer>

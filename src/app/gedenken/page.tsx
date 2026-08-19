@@ -2,17 +2,42 @@ import type { Metadata } from 'next';
 import { WolkenBand, Sterne } from '@/components/Himmel';
 import { Sternbild, Kerze } from '@/components/Sternbild';
 import { Galerie, type Stueck } from '@/components/Galerie';
+import { pfad } from '@/lib/pfad';
 import medien from '@/data/medien.json';
+import { KURATION, GRUPPEN, type Gruppe } from '@/data/kuration';
 
 export const metadata: Metadata = {
   title: 'Gedenken',
   description: 'Eine Seite für Simba und Nala.',
 };
 
+/* Das Bild ganz oben. Steht hier und nicht in der Kuration, weil es
+   eine Rolle hat und nicht bloss ein Eintrag in einer Liste ist. */
+const KOPFBILD = 'img_20170608_140220';
+
+/* Copyright steht sichtbar unter der Galerie — siehe auch die Fusszeile. */
+const RECHTE = '© Bastian Klaus';
+
+type Roh = (typeof medien.bilder)[number];
+
 export default function Gedenken() {
-  /* Bilder zuerst, Videos danach — beides kommt aus public/medien/,
-     eingelesen von scripts/medien.mjs beim Bauen. */
-  const stuecke = [...medien.bilder, ...medien.videos] as Stueck[];
+  const alle: Stueck[] = [...medien.bilder, ...medien.videos].map((m: Roh) => ({
+    ...(m as Stueck),
+    gross: KURATION[m.id]?.gross ?? false,
+    /* Der Text aus der Kuration schlaegt den aus dem Dateinamen. */
+    text: KURATION[m.id]?.text ?? m.text,
+  }));
+
+  const kopf = alle.find((s) => s.id === KOPFBILD);
+  const uebrig = alle.filter((s) => s.id !== KOPFBILD);
+
+  const nachGruppe = (g: Gruppe) => uebrig.filter((s) => KURATION[s.id]?.gruppe === g);
+  const ohneGruppe = uebrig.filter((s) => !KURATION[s.id]?.gruppe);
+
+  const gruppenMitInhalt = GRUPPEN.map((g) => ({ ...g, stuecke: nachGruppe(g.key) }))
+    .filter((g) => g.stuecke.length > 0);
+
+  const garNichts = alle.length === 0;
 
   return (
     <section className="nacht">
@@ -34,17 +59,24 @@ export default function Gedenken() {
           </p>
         </div>
 
+        {kopf && (
+          <figure className="kopfbild">
+            <img src={pfad(kopf.pfad)} alt={kopf.text} fetchPriority="high" decoding="async" />
+            <figcaption>{kopf.text}</figcaption>
+          </figure>
+        )}
+
         {/* ---------- Sternbilder ---------- */}
         <div className="sternbilder">
           <Sternbild
             name="Simba"
-            text="Immer zuerst da, wenn etwas los war."
-            farbe="#f6c97a"
+            text="Der rote Tiger."
+            farbe="#e8a35c"
             versatz={0}
           />
           <Sternbild
             name="Nala"
-            text="Und immer da, wenn nichts los war."
+            text="Die Weiße mit den roten Flecken."
             farbe="#ffe3ad"
             versatz={1.1}
           />
@@ -62,34 +94,53 @@ export default function Gedenken() {
             Status-Ampel, der ganze Aufwand mit den Notfällen — trägt ihre
             Namen.
           </p>
-          <p>
-            Danke für die Zeit. Für alles.
-          </p>
+          <p>Danke für die Zeit. Für alles.</p>
         </div>
 
-        {/* ---------- Galerie ---------- */}
-        <div className="galerie-kopf" id="bilder">
-          <span className="eyebrow">Bilder und Videos</span>
-          <h2>Wie sie waren</h2>
-          <p>
-            {stuecke.length > 0
-              ? 'Antippen für die große Ansicht. Mit den Pfeiltasten weiterblättern, Escape schließt.'
-              : 'Hier ist noch Platz.'}
-          </p>
-        </div>
+        {/* ---------- Abschnitte ---------- */}
+        {gruppenMitInhalt.map((g) => (
+          <section key={g.key} className="gruppe">
+            <div className="galerie-kopf">
+              <span className="eyebrow">{g.text}</span>
+              <h2>{g.titel}</h2>
+            </div>
+            <Galerie stuecke={g.stuecke} />
+          </section>
+        ))}
 
-        {stuecke.length > 0 ? (
-          <Galerie stuecke={stuecke} />
-        ) : (
+        {ohneGruppe.length > 0 && (
+          <section className="gruppe">
+            <div className="galerie-kopf">
+              <span className="eyebrow">Und sonst</span>
+              <h2>Alles andere</h2>
+              <p>
+                Was noch dazugekommen ist. Wer etwas davon einsortieren will,
+                trägt es in <code>src/data/kuration.ts</code> ein.
+              </p>
+            </div>
+            <Galerie stuecke={ohneGruppe} />
+          </section>
+        )}
+
+        {garNichts && (
           <div className="leer">
             <h3>Noch keine Bilder da</h3>
             <p>
-              Fotos und Videos einfach in die Ordner legen — beim nächsten Push
-              stehen sie automatisch hier. Nichts weiter zu tun.
+              Fotos und Videos in <code>roh/</code> legen und einmal
+              <code> npm run aufbereiten</code> laufen lassen — danach stehen
+              sie hier.
             </p>
             <span className="pfad">public/medien/bilder/ · public/medien/videos/</span>
           </div>
         )}
+
+        <p className="galerie-fuss">
+          Antippen für die große Ansicht. Mit den Pfeiltasten weiterblättern,
+          Escape schließt.
+          <span className="rechte">
+            Alle Fotos und Videos {RECHTE}. Bitte nicht ohne Rücksprache weiterverwenden.
+          </span>
+        </p>
       </div>
     </section>
   );

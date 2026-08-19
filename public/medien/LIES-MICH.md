@@ -1,15 +1,49 @@
-# Bilder und Videos hier reinlegen
+# Bilder und Videos
+
+## Der kurze Weg
+
+Originaldateien vom Handy in den Ordner `roh/` legen (oben im Projekt,
+nicht hier) und einmal ausführen:
+
+```bash
+npm run aufbereiten
+```
+
+Fertig. Das Skript legt alles Nötige in den drei Ordnern hier an. Danach
+committen und pushen — GitHub Actions baut die Seite neu.
+
+Ein anderer Quellordner geht auch:
+
+```bash
+npm run aufbereiten -- "C:/Users/basti/Music/Vid Img"
+```
+
+## Was hier liegt
 
 ```
 public/medien/
-├── bilder/   ← Fotos:  .jpg .jpeg .png .webp .avif .gif
-└── videos/   ← Videos: .mp4 .webm .mov .m4v
+├── bilder/     fertige Bilder fürs Web (.webp, max. 2400 px)
+├── videos/     fertige Videos fürs Web (.mp4, H.264/AAC, max. 1080p)
+├── vorschau/   Vorschaubild je Datei — bei Videos ein Standbild
+└── masse.json  Seitenverhältnisse, damit das Raster nicht zuschneidet
 ```
 
-Einfach die Dateien in den passenden Ordner kopieren — mehr ist nicht nötig.
-Beim nächsten `npm run dev` oder `npm run build` (und bei jedem Push, weil
-GitHub Actions genau das ausführt) werden sie automatisch eingelesen und
-auf der Gedenkseite angezeigt.
+Diese Ordner werden vom Skript befüllt. Von Hand hineinlegen geht auch,
+solange es Web-Formate sind.
+
+## Warum nicht einfach die Originale?
+
+Das ist genau der Grund, warum die Videos zuerst nicht liefen:
+
+- **`.MOV`** ist ein QuickTime-Container. Firefox spielt ihn nicht ab,
+  auch wenn H.264 darin steckt.
+- **HEVC (H.265)**, das iPhones ab 4K aufnehmen, kann **kein** Browser.
+- Eine 1,3-GB-Datei lädt niemand über eine Webseite. GitHub nimmt Dateien
+  über 100 MB ohnehin nicht an.
+
+`npm run aufbereiten` löst alle drei Punkte auf einmal. Nebenbei werden
+die EXIF-Daten entfernt — in Handyfotos steckt sonst der GPS-Standort,
+und die Seite ist öffentlich.
 
 ## Reihenfolge
 
@@ -24,25 +58,29 @@ bestimmen will, stellt Zahlen voran:
 
 Die führende Zahl wird in der Anzeige wieder abgeschnitten.
 
-## Eigene Bildunterschriften
+## Texte und Abschnitte
 
-Optional eine Datei `bildtexte.json` in `bilder/` bzw. `videos/` anlegen:
+Wo ein Bild auf der Gedenkseite landet und was darunter steht, regelt
+[`src/data/kuration.ts`](../../src/data/kuration.ts):
 
-```json
-{
-  "01-simba-erster-tag.jpg": "Simbas erster Tag bei uns.",
-  "02-nala-im-garten.jpg": "Nala hat den Garten sofort für sich beansprucht."
-}
+```ts
+img_3913: { gruppe: 'momente', text: 'Schlafen im Sitzen.' },
 ```
 
-Ohne Eintrag wird der Dateiname als Text benutzt (Bindestriche werden zu
-Leerzeichen).
+Abschnitte sind `zusammen`, `momente`, `garten` und `weite` — die
+Überschriften dazu stehen in derselben Datei unter `GRUPPEN`. Was nicht
+eingetragen ist, landet automatisch unter „Alles andere". Es geht also
+nichts verloren, wenn neue Dateien dazukommen.
 
-## Größe
+Nur schnell einen Text ändern geht auch ohne TypeScript: eine
+`bildtexte.json` in `bilder/` oder `videos/` anlegen.
 
-GitHub mag keine riesigen Dateien. Faustregel:
+```json
+{ "img_3913.webp": "Schlafen im Sitzen — die Spezialdisziplin." }
+```
 
-- Fotos: unter 2 MB pro Bild — lange Kante ca. 2000 px reicht völlig
-- Videos: unter 50 MB, am besten `.mp4` (H.264) oder `.webm`
+## Größe im Blick behalten
 
-Alles über 100 MB weist GitHub direkt ab.
+Das Skript warnt, wenn ein Video über 95 MB landet. Wird es öfter eng,
+in [`scripts/aufbereiten.mjs`](../../scripts/aufbereiten.mjs) den Wert
+`crf` erhöhen (26 → 28) oder `maxrate` senken.

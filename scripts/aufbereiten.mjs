@@ -43,12 +43,23 @@ const VIDEO_EIN = new Set(['.mov', '.mp4', '.m4v', '.avi', '.mkv', '.webm', '.3g
 const BREITE_GROSS = 2400;
 const BREITE_VORSCHAU = 800;
 
-const quelle = resolve(process.argv[2] ?? join(wurzel, 'roh'));
+const eigenerPfad = process.argv[2];
+const quelle = resolve(eigenerPfad ?? join(wurzel, 'roh'));
+
 if (!existsSync(quelle)) {
-  console.error(`Ordner nicht gefunden: ${quelle}`);
-  console.error('Aufruf: npm run aufbereiten -- "C:/Pfad/zu/den/Originalen"');
-  process.exit(1);
+  if (eigenerPfad) {
+    console.error(`Ordner nicht gefunden: ${quelle}`);
+    console.error('Aufruf: npm run aufbereiten -- "C:/Pfad/zu/den/Originalen"');
+    process.exit(1);
+  }
+  /* roh/ steht in .gitignore und fehlt daher nach einem frischen Clone.
+     Kein Grund abzubrechen — einfach anlegen. */
+  mkdirSync(join(quelle, 'bilder'), { recursive: true });
+  mkdirSync(join(quelle, 'videos'), { recursive: true });
+  console.log(`Ordner roh/bilder und roh/videos angelegt.`);
 }
+mkdirSync(join(quelle, 'bilder'), { recursive: true });
+mkdirSync(join(quelle, 'videos'), { recursive: true });
 
 for (const o of [ZIEL_BILD, ZIEL_VIDEO, ZIEL_VORSCHAU_BILD, ZIEL_VORSCHAU_VIDEO]) mkdirSync(o, { recursive: true });
 

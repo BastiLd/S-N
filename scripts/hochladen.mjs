@@ -66,18 +66,26 @@ schritt(1, 'Fotos und Videos fuers Web umrechnen …');
 if (neu === 0) console.log('   roh/ ist leer — es wird nur nachgetragen, was schon da ist.');
 lauf(NODE, [join(wurzel, 'scripts', 'aufbereiten.mjs')]);
 
-/* --- 2. Medienliste ---------------------------------------------- */
-schritt(2, 'Medienliste schreiben …');
+/* --- 2. Aufnahmedaten ---------------------------------------------- */
+schritt(2, 'Kamera, Zeitpunkt und Ort aus den Originalen lesen …');
+lauf(NODE, [join(wurzel, 'scripts', 'exif.mjs')]);
+
+/* --- 3. Verschluesseln ---------------------------------------------- */
+schritt(3, 'Aufnahmedaten verschluesseln …');
+lauf(NODE, [join(wurzel, 'scripts', 'verschluesseln.mjs')]);
+
+/* --- 4. Medienliste ---------------------------------------------- */
+schritt(4, 'Medienliste schreiben …');
 lauf(NODE, [join(wurzel, 'scripts', 'medien.mjs')]);
 
-/* --- 3. Probebau -------------------------------------------------- */
-schritt(3, 'Probebau — damit nichts Kaputtes gepusht wird …');
+/* --- 5. Probebau -------------------------------------------------- */
+schritt(5, 'Probebau — damit nichts Kaputtes gepusht wird …');
 lauf(NODE, [NEXT, 'build'], { env: { ...process.env, NEXT_PUBLIC_BASE_PATH: '/S-N' } });
 /* Das Ergebnis brauchen wir lokal nicht; GitHub baut selbst neu. */
 rmSync(join(wurzel, 'out'), { recursive: true, force: true });
 
-/* --- 4. Committen und pushen -------------------------------------- */
-schritt(4, 'Aenderungen sichern und hochladen …');
+/* --- 6. Committen und pushen -------------------------------------- */
+schritt(6, 'Aenderungen sichern und hochladen …');
 lauf('git', ['add', '-A']);
 
 const offen = still('git status --porcelain');
@@ -91,8 +99,8 @@ const stempel = new Date().toLocaleString('de-AT', { dateStyle: 'short', timeSty
 lauf('git', ['commit', '-m', `Medien aktualisiert (${stempel}) — ${anzahl} Datei(en)`]);
 lauf('git', ['push', 'origin', BRANCH]);
 
-/* --- 5. Fertig ---------------------------------------------------- */
-schritt(5, 'Fertig.');
+/* --- 7. Fertig ---------------------------------------------------- */
+schritt(7, 'Fertig.');
 console.log(`
 GitHub baut die Seite jetzt neu — das dauert ungefaehr eine Minute.
 

@@ -5,6 +5,10 @@
    ============================================================ */
 
 :root {
+  /* Safe Areas (Notch, Home-Indikator) — 0 auf dem Desktop */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+
   /* Tag / Landing */
   --sturm-0: #101d33;
   --sturm-1: #1b3a52;
@@ -392,13 +396,29 @@ p  { margin: 0; line-height: 1.65; text-wrap: pretty; }
 .fuss-grid { display: flex; flex-wrap: wrap; gap: 26px; justify-content: space-between; align-items: flex-start; }
 .fuss a { color: var(--hell-2); text-decoration: none; }
 .fuss a:hover { color: var(--teal-400); text-decoration: underline; }
-.fuss ul { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 8px; }
+.fuss ul { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 2px; }
+/* Auf dem Handy muss man die Links treffen koennen — reiner Text in
+   13-px-Zeilen ist dafuer zu klein. Die Flaeche waechst, das Aussehen
+   bleibt. */
+.fuss li { line-height: 1.5; }
+.fuss ul a {
+  display: inline-block; padding: 7px 0; min-height: 24px;
+}
+@media (max-width: 700px) {
+  .fuss ul a { padding: 10px 0; }
+  .fuss-grid { gap: 22px; }
+}
 .fuss .titel { color: var(--hell); font-weight: 700; font-size: 14.5px; }
 .fuss-unten { margin-top: 34px; padding-top: 22px; border-top: 1px solid rgba(255,255,255,.09); font-size: 13px; }
 .fuss-unten .copyright { color: var(--hell-2); font-size: 13.5px; }
 .fuss-unten .copyright strong { color: var(--hell); letter-spacing: .01em; }
 
 /* Rechtehinweis unter der Galerie */
+.galerie-fuss kbd {
+  display: inline-block; padding: 1px 6px; margin: 0 1px; border-radius: 5px;
+  background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18);
+  font: 600 11.5px/1.5 ui-monospace, Menlo, Consolas, monospace; color: var(--hell-2);
+}
 .galerie-fuss .rechte {
   display: block; margin-top: 8px; font-size: 12.5px; color: var(--hell-3); opacity: .85;
 }
@@ -554,6 +574,17 @@ p  { margin: 0; line-height: 1.65; text-wrap: pretty; }
   padding: 26px 15px 13px; font-size: 13.5px; font-weight: 600; color: #fff;
   background: linear-gradient(180deg, rgba(6, 9, 26, 0), rgba(6, 9, 26, .88));
 }
+.stueck-dauer {
+  position: absolute; top: 12px; left: 12px;
+  padding: 3px 8px; border-radius: 999px;
+  background: rgba(6, 9, 26, .68); backdrop-filter: blur(6px);
+  font-size: 11.5px; font-weight: 600; color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+.stueck-datum {
+  display: block; margin-top: 2px; font-size: 11.5px; font-weight: 500;
+  color: rgba(255, 255, 255, .72); font-variant-numeric: tabular-nums;
+}
 .stueck-play {
   position: absolute; top: 12px; right: 12px;
   width: 32px; height: 32px; border-radius: 50%;
@@ -584,35 +615,266 @@ p  { margin: 0; line-height: 1.65; text-wrap: pretty; }
   background: rgba(6, 9, 26, .45); border: 1px solid rgba(246, 201, 122, .26);
 }
 
-/* Lightbox */
-.lb {
+/* ============================================================
+   Betrachter (Grossansicht)
+   Kopfleiste oben, Buehne in der Mitte, Vorschaustreifen unten —
+   alles auf 100dvh, damit auf dem Handy nichts unter die Systemleiste
+   rutscht. Die Safe-Area-Werte fangen Notch und Home-Indikator ab.
+   ============================================================ */
+.bt {
   position: fixed; inset: 0; z-index: 200;
-  background: rgba(4, 6, 16, .93); backdrop-filter: blur(12px);
-  display: grid; place-items: center; padding: 26px;
-  animation: lb-auf .18s ease;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  height: 100dvh;
+  background: rgba(4, 6, 16, .96);
+  backdrop-filter: blur(14px);
+  animation: bt-auf .16s ease;
+  overscroll-behavior: contain;
 }
-@keyframes lb-auf { from { opacity: 0; } to { opacity: 1; } }
-.lb-inhalt { max-width: min(1100px, 94vw); max-height: 86vh; text-align: center; }
-.lb-inhalt img, .lb-inhalt video { max-height: 76vh; width: auto; margin: 0 auto; border-radius: var(--r-md);
-                                   box-shadow: 0 30px 90px rgba(0, 0, 0, .6); }
-.lb-text { margin-top: 16px; color: var(--hell-2); font-size: 15px; }
-.lb-zu {
-  position: absolute; top: 18px; right: 18px;
-  width: 46px; height: 46px; border-radius: 50%; cursor: pointer;
-  background: rgba(255, 255, 255, .12); border: 1px solid rgba(255,255,255,.24);
+@supports not (height: 100dvh) { .bt { height: 100vh; } }
+@keyframes bt-auf { from { opacity: 0; } to { opacity: 1; } }
+
+.bt-kopf {
+  display: flex; align-items: center; gap: 12px;
+  padding: calc(12px + var(--safe-top, 0px)) 14px 12px;
+  color: var(--hell);
+  border-bottom: 1px solid rgba(255, 255, 255, .1);
+}
+.bt-titel { flex: 1; min-width: 0; }
+.bt-text {
+  display: block; font-size: 15px; font-weight: 600;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.bt-zaehler {
+  display: block; margin-top: 2px; font-size: 12.5px; color: var(--hell-3);
+  font-variant-numeric: tabular-nums;
+}
+.bt-knoepfe { display: flex; gap: 8px; flex: none; }
+.bt-knopf {
+  width: 44px; height: 44px; border-radius: 50%; flex: none; cursor: pointer;
+  background: rgba(255, 255, 255, .1); border: 1px solid rgba(255, 255, 255, .18);
   color: #fff; display: grid; place-items: center;
+  transition: background .15s ease, color .15s ease, border-color .15s ease;
 }
-.lb-zu:hover { background: rgba(255, 255, 255, .22); }
-.lb-pfeil {
+.bt-knopf:hover { background: rgba(255, 255, 255, .2); }
+.bt-knopf.an { background: var(--gold); border-color: var(--gold); color: #3a2708; }
+.bt-knopf:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+
+.bt-buehne {
+  position: relative; overflow: hidden;
+  display: grid; place-items: center;
+  touch-action: none;
+  cursor: zoom-in;
+}
+.bt-buehne.gezoomt { cursor: grab; }
+.bt-buehne.gezoomt:active { cursor: grabbing; }
+.bt-bild {
+  max-width: 100%; max-height: 100%;
+  width: auto; height: auto;
+  object-fit: contain;
+  user-select: none; -webkit-user-drag: none;
+  will-change: transform;
+}
+.bt-video { max-width: 100%; max-height: 100%; width: auto; background: #000; border-radius: 8px; }
+
+.bt-pfeil {
   position: absolute; top: 50%; transform: translateY(-50%);
-  width: 50px; height: 50px; border-radius: 50%; cursor: pointer;
-  background: rgba(255, 255, 255, .1); border: 1px solid rgba(255,255,255,.2);
+  width: 52px; height: 52px; border-radius: 50%; cursor: pointer;
+  background: rgba(10, 14, 30, .55); border: 1px solid rgba(255, 255, 255, .2);
   color: #fff; display: grid; place-items: center;
+  backdrop-filter: blur(8px);
+  transition: background .15s ease;
 }
-.lb-pfeil:hover { background: rgba(255, 255, 255, .2); }
-.lb-pfeil.links { left: 16px; }
-.lb-pfeil.rechts { right: 16px; }
-@media (max-width: 620px) { .lb-pfeil { width: 42px; height: 42px; } .lb-pfeil.links { left: 8px; } .lb-pfeil.rechts { right: 8px; } }
+.bt-pfeil:hover { background: rgba(10, 14, 30, .85); }
+.bt-pfeil.links { left: 14px; }
+.bt-pfeil.rechts { right: 14px; }
+
+/* ---------- Info-Tafel ---------- */
+.bt-info {
+  position: absolute; right: 14px; top: calc(74px + var(--safe-top, 0px));
+  width: min(340px, calc(100vw - 28px));
+  max-height: min(70dvh, 640px); overflow-y: auto; overscroll-behavior: contain;
+  background: rgba(12, 16, 34, .96); backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, .14); border-radius: var(--r-lg);
+  padding: 20px; color: var(--hell);
+  box-shadow: 0 28px 70px rgba(0, 0, 0, .6);
+  animation: bt-info-auf .18s cubic-bezier(.2,.8,.3,1);
+  z-index: 3;
+}
+@keyframes bt-info-auf { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+.bt-info h3 { font-size: 15px; color: var(--gold-2); letter-spacing: .04em; text-transform: uppercase; }
+.bt-info dl {
+  margin: 14px 0 0; display: grid; grid-template-columns: auto 1fr;
+  gap: 8px 16px; font-size: 13.5px; align-items: baseline;
+}
+.bt-info dt { color: var(--hell-3); white-space: nowrap; }
+.bt-info dd { margin: 0; color: var(--hell); overflow-wrap: anywhere; }
+.bt-osm {
+  display: inline-block; margin-top: 16px; font-size: 13px;
+  color: var(--gold-2); text-decoration: none; border-bottom: 1px solid rgba(246,201,122,.4);
+}
+.bt-osm:hover { color: #fff; }
+.bt-rechte { margin-top: 14px; font-size: 12px; color: var(--hell-3); }
+
+/* ---------- Vorschaustreifen ---------- */
+.bt-streifen {
+  display: flex; gap: 8px; overflow-x: auto; overscroll-behavior-x: contain;
+  padding: 10px 14px calc(10px + var(--safe-bottom, 0px));
+  border-top: 1px solid rgba(255, 255, 255, .1);
+  scrollbar-width: thin;
+}
+.bt-mini {
+  position: relative; flex: none; width: 62px; height: 62px; padding: 0; cursor: pointer;
+  border-radius: 10px; overflow: hidden;
+  border: 2px solid transparent; background: rgba(255, 255, 255, .06);
+  opacity: .5; transition: opacity .15s ease, border-color .15s ease, transform .15s ease;
+}
+.bt-mini:hover { opacity: .85; }
+.bt-mini.an { opacity: 1; border-color: var(--gold); transform: translateY(-2px); }
+.bt-mini img { width: 100%; height: 100%; object-fit: cover; }
+.bt-mini-play {
+  position: absolute; inset: 0; margin: auto; width: 0; height: 0;
+  border-left: 11px solid rgba(255,255,255,.95);
+  border-top: 7px solid transparent; border-bottom: 7px solid transparent;
+  filter: drop-shadow(0 1px 3px rgba(0,0,0,.7));
+}
+
+/* ---------- Handy ---------- */
+@media (max-width: 700px) {
+  .bt-kopf { padding: calc(10px + var(--safe-top, 0px)) 10px 10px; gap: 8px; }
+  .bt-text { font-size: 14px; }
+  .bt-knopf { width: 40px; height: 40px; }
+  /* Die Pfeile ersetzt hier das Wischen — sie wuerden nur das Bild verdecken. */
+  .bt-pfeil { display: none; }
+  .bt-info {
+    right: 8px; left: 8px; width: auto;
+    top: calc(66px + var(--safe-top, 0px));
+    max-height: 60dvh; padding: 16px;
+  }
+  .bt-info dl { grid-template-columns: 1fr; gap: 2px 0; }
+  .bt-info dt { margin-top: 8px; font-size: 12px; }
+  .bt-streifen { padding: 8px 10px calc(8px + var(--safe-bottom, 0px)); gap: 6px; }
+  .bt-mini { width: 52px; height: 52px; }
+}
+
+/* ============================================================
+   Karte
+   ============================================================ */
+.karte-rahmen {
+  position: relative; z-index: 1; margin-top: 30px;
+  border-radius: var(--r-xl); overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, .14);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, .45);
+}
+.karte { height: clamp(320px, 52vh, 560px); width: 100%; background: #0f1430; }
+
+/* Leaflet bringt eigene helle Farben mit — die passen hier nicht. */
+.karte .leaflet-control-attribution {
+  background: rgba(12, 16, 34, .85); color: var(--hell-3); font-size: 11px;
+}
+.karte .leaflet-control-attribution a { color: var(--teal-400); }
+.karte .leaflet-control-zoom a {
+  background: rgba(12, 16, 34, .92); color: var(--hell);
+  border-color: rgba(255, 255, 255, .16);
+}
+.karte .leaflet-control-zoom a:hover { background: rgba(30, 38, 70, .96); }
+.karte .leaflet-popup-content-wrapper, .karte .leaflet-popup-tip {
+  background: rgba(12, 16, 34, .96); color: var(--hell);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, .5);
+}
+.karte .leaflet-popup-content { margin: 12px 14px; font-size: 13.5px; line-height: 1.5; }
+.karte .leaflet-popup-content strong { color: var(--gold-2); }
+.karte .kp-koord { color: var(--hell-3); font-size: 12px; font-variant-numeric: tabular-nums; }
+.karte .leaflet-container a.leaflet-popup-close-button { color: var(--hell-3); }
+
+/* Nadel mit Vorschaubild statt Standard-Pin */
+.karten-nadel { position: relative; cursor: pointer; }
+.karten-nadel .kn-bild {
+  position: absolute; left: 3px; top: 0;
+  width: 40px; height: 40px; border-radius: 50% 50% 50% 4px;
+  transform: rotate(-45deg);
+  background-size: cover; background-position: center;
+  border: 2.5px solid var(--gold);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .6);
+  transition: transform .18s ease;
+}
+.karten-nadel:hover .kn-bild { transform: rotate(-45deg) scale(1.12); }
+.karten-nadel .kn-zahl {
+  position: absolute; right: -2px; top: -4px; z-index: 2;
+  min-width: 20px; height: 20px; padding: 0 5px; border-radius: 999px;
+  background: var(--gold); color: #3a2708;
+  font: 700 11.5px/20px var(--font); text-align: center;
+  border: 2px solid rgba(12, 16, 34, .9);
+}
+
+/* ============================================================
+   Schloss — Eingabe fuer die verschluesselten Aufnahmedaten
+   ============================================================ */
+.schloss { text-align: center; }
+.schloss-ic {
+  display: inline-grid; place-items: center;
+  width: 52px; height: 52px; border-radius: 50%;
+  background: rgba(246, 201, 122, .14); color: var(--gold);
+  border: 1px solid rgba(246, 201, 122, .3);
+}
+.schloss h4 {
+  margin: 14px 0 0; font-size: 16px; font-weight: 700;
+  color: var(--gold-2); letter-spacing: -.01em;
+}
+.schloss p {
+  margin: 8px auto 0; max-width: 42ch;
+  font-size: 13.5px; line-height: 1.6; color: var(--hell-3);
+}
+.schloss-zeile {
+  margin-top: 18px; display: flex; gap: 8px; flex-wrap: wrap;
+  justify-content: center;
+}
+.schloss-zeile input {
+  flex: 1 1 190px; min-width: 0;
+  padding: 12px 16px; border-radius: var(--r-pill);
+  background: rgba(6, 9, 26, .55); color: var(--hell);
+  border: 1px solid rgba(255, 255, 255, .18);
+  font-size: 15px; font-family: inherit;
+}
+.schloss-zeile input::placeholder { color: var(--hell-3); }
+.schloss-zeile input:focus {
+  outline: none; border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(246, 201, 122, .2);
+}
+.schloss-zeile button {
+  flex: none; padding: 12px 22px; border-radius: var(--r-pill);
+  border: 0; cursor: pointer;
+  background: linear-gradient(140deg, var(--gold-2), var(--gold));
+  color: #3a2708; font-size: 14.5px; font-weight: 650; font-family: inherit;
+  transition: transform .15s ease, opacity .15s ease;
+}
+.schloss-zeile button:hover:not(:disabled) { transform: translateY(-1px); }
+.schloss-zeile button:disabled { opacity: .45; cursor: default; }
+.schloss-fehler {
+  margin-top: 12px; font-size: 13.5px; color: #ffb0a8;
+}
+
+/* Schloss anstelle der Karte */
+.karte-schloss {
+  position: relative; z-index: 1; margin-top: 30px;
+  padding: clamp(34px, 5vw, 56px) 24px;
+  border-radius: var(--r-xl);
+  border: 1.5px dashed rgba(246, 201, 122, .34);
+  background: rgba(255, 255, 255, .035);
+}
+
+/* Wieder-abschliessen-Link in der Info-Tafel */
+.bt-zu-schliessen {
+  display: inline; margin-left: 8px; padding: 0; cursor: pointer;
+  background: none; border: 0; font: inherit; font-size: 12px;
+  color: var(--gold-2); text-decoration: underline; text-underline-offset: 2px;
+}
+.bt-zu-schliessen:hover { color: #fff; }
+
+@media (max-width: 620px) {
+  .schloss-zeile { flex-direction: column; }
+  .schloss-zeile button { width: 100%; }
+}
 
 /* ============================================================
    Wer weniger Bewegung moechte, bekommt weniger Bewegung.

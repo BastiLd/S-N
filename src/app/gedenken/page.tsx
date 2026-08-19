@@ -1,9 +1,11 @@
 import type { Metadata } from 'next';
 import { WolkenBand, Sterne } from '@/components/Himmel';
 import { Sternbild, Kerze } from '@/components/Sternbild';
-import { Galerie, type Stueck } from '@/components/Galerie';
+import { Galerie } from '@/components/Galerie';
+import { Karte } from '@/components/Karte';
+import type { Stueck } from '@/lib/medien';
 import { pfad } from '@/lib/pfad';
-import medien from '@/data/medien.json';
+import medienRoh from '@/data/medien.json';
 import { KURATION, GRUPPEN, type Gruppe } from '@/data/kuration';
 
 export const metadata: Metadata = {
@@ -18,11 +20,14 @@ const KOPFBILD = 'img_20170608_140220';
 /* Copyright steht sichtbar unter der Galerie — siehe auch die Fusszeile. */
 const RECHTE = '© Bastian Klaus';
 
-type Roh = (typeof medien.bilder)[number];
+/* Aus der JSON-Datei liest TypeScript zwei verschiedene Meta-Formen
+   heraus (Bild hat Blende und ISO, Video Codec und Dauer). Der Aufbau
+   steht in src/lib/medien.ts — hier einmal darauf festlegen. */
+const medien = medienRoh as unknown as { bilder: Stueck[]; videos: Stueck[] };
 
 export default function Gedenken() {
-  const alle: Stueck[] = [...medien.bilder, ...medien.videos].map((m: Roh) => ({
-    ...(m as Stueck),
+  const alle: Stueck[] = [...medien.bilder, ...medien.videos].map((m) => ({
+    ...m,
     gross: KURATION[m.id]?.gross ?? false,
     /* Der Text aus der Kuration schlaegt den aus dem Dateinamen. */
     text: KURATION[m.id]?.text ?? m.text,
@@ -134,9 +139,13 @@ export default function Gedenken() {
           </div>
         )}
 
+        {/* ---------- Karte ---------- */}
+        <Karte stuecke={alle} />
+
         <p className="galerie-fuss">
-          Antippen für die große Ansicht. Mit den Pfeiltasten weiterblättern,
-          Escape schließt.
+          Antippen für die große Ansicht: Pfeiltasten oder Wischen zum
+          Blättern, <kbd>i</kbd> für die Aufnahmedaten, Mausrad oder zwei
+          Finger zum Zoomen, <kbd>Esc</kbd> schließt.
           <span className="rechte">
             Alle Fotos und Videos {RECHTE}. Bitte nicht ohne Rücksprache weiterverwenden.
           </span>

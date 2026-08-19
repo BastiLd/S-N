@@ -12,3 +12,11 @@ Thumbs.db
 # Originaldateien vom Handy - kommen nicht ins Repository,
 # sondern gehen durch `npm run aufbereiten`.
 roh/
+
+# Metadaten im Klartext (mit genauen GPS-Koordinaten) bleiben lokal.
+# Liegt bewusst NICHT unter public/ — was dort liegt, wird beim Bauen
+# mit ausgeliefert. Ins Repository geht nur geheim.json.
+daten/
+
+# Das Passwort selbst niemals einchecken.
+.passwort

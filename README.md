@@ -76,10 +76,70 @@ abspielt, iPhone-4K ist **HEVC** und läuft in *keinem* Browser, und
 werden EXIF-Daten entfernt — sonst steckt der GPS-Standort in den Fotos,
 und die Seite ist öffentlich.
 
+`Hochladen.bat` erledigt dabei sieben Schritte: umrechnen, Aufnahmedaten
+aus den Originalen lesen, verschlüsseln, Medienliste schreiben,
+Probebau, committen, pushen.
+
 Wo ein Bild landet und was darunter steht, regelt
 [`src/data/kuration.ts`](src/data/kuration.ts). Nicht eingetragene
 Dateien landen automatisch unter „Alles andere". Details in
 [`public/medien/LIES-MICH.md`](public/medien/LIES-MICH.md).
+
+---
+
+## Aufnahmedaten und Karte — mit Passwort
+
+Kamera, Zeitpunkt und Aufnahmeort stehen im Betrachter hinter dem
+**i**-Knopf, und auf der Gedenkseite gibt es eine Karte mit den Orten.
+Beides ist **verschlüsselt**.
+
+Das ist kein „if (passwort === …)" in JavaScript — das wäre wirkungslos,
+weil der Wert im Quelltext stünde. Stattdessen:
+
+| | |
+|---|---|
+| Schlüssel | PBKDF2-HMAC-SHA256, 310 000 Runden, zufälliges Salz |
+| Inhalt | AES-256-GCM mit Authentifizierungs-Tag |
+| Entschlüsselt wird | im Browser, über die eingebaute WebCrypto-Schnittstelle |
+
+In `public/medien/geheim.json` steht deshalb nur Rauschen. Ohne das
+Passwort ist daraus nichts zu holen — auch nicht mit den
+Entwicklerwerkzeugen und auch nicht mit dem heruntergeladenen
+Repository. Das passt zu GitHub Pages, weil dort ohnehin nur statische
+Dateien ausgeliefert werden; ein serverseitiges Passwort wäre gar nicht
+möglich.
+
+Der Klartext liegt in `daten/meta.json` und ist doppelt geschützt:
+in `.gitignore`, und **außerhalb von `public/`** — denn alles unter
+`public/` wird beim Bauen mit ausgeliefert.
+
+Das Passwort selbst steht in `.passwort` im Projektordner (ebenfalls in
+`.gitignore`) oder in der Umgebungsvariable `SN_PASSWORT`. GitHub
+Actions braucht es nie — dort wird nur die fertige, verschlüsselte Datei
+ausgeliefert.
+
+Nach dem Ändern des Passworts:
+
+```bash
+npm run verschluesseln
+```
+
+### Wie genau die Karte zeigt
+
+`ORTSGENAUIGKEIT` in [`src/lib/einstellungen.ts`](src/lib/einstellungen.ts):
+
+- `'genau'` — exakt auf wenige Meter
+- `'ungefaehr'` — auf ~1 km gerundet · **Standard**
+- `'aus'` — keine Karte, keine Koordinaten
+
+Standard ist `'ungefaehr'`, weil die Fotos vom Platz im Garten zu Hause
+entstanden sind. Der Ortsname (z. B. „Musterdorf, Kärnten") kommt von
+OpenStreetMap und ist ohnehin nur ortsgenau.
+
+Die Karte selbst ist Leaflet mit Kacheln von OpenStreetMap — frei
+nutzbar, kein Konto, kein Schlüssel. Ortsnamen werden **einmal beim
+Aufbereiten** über Nominatim aufgelöst und mitgespeichert; im Browser
+läuft dafür keine Abfrage.
 
 ---
 
@@ -141,6 +201,10 @@ greift, muss im Repository unter **Settings → Pages** als *Source*
 
 ```
 .github/workflows/pages.yml   baut und veröffentlicht
+scripts/aufbereiten.mjs       rechnet Rohmaterial fürs Web um
+scripts/exif.mjs              liest Kamera, Zeit und Ort aus den Originalen
+scripts/verschluesseln.mjs    verschlüsselt die Aufnahmedaten
+scripts/hochladen.mjs         alles in einem Zug (siehe Hochladen.bat)
 scripts/medien.mjs            liest public/medien/ ein
 public/medien/                hier kommen Fotos und Videos rein
 src/app/page.tsx              Startseite (Sturm-Hero, Zugänge, Branches)
@@ -148,7 +212,12 @@ src/app/gedenken/page.tsx     Gedenkseite (Nachthimmel, Sternbilder, Galerie)
 src/app/globals.css           alles Visuelle
 src/components/Himmel.tsx     Wolken, Regen, Tornado, Hügel, Sterne, Pfote
 src/components/Sternbild.tsx  Pfoten-Sternbild und Kerze
-src/components/Galerie.tsx    Galerie mit Lightbox
+src/components/Galerie.tsx    Raster der Vorschaubilder
+src/components/Betrachter.tsx Großansicht: Zoom, Wischen, Aufnahmedaten
+src/components/Karte.tsx      Karte der Aufnahmeorte (Leaflet + OSM)
+src/components/Schloss.tsx    Passworteingabe
+src/lib/geheim.ts             Entschlüsseln im Browser
+src/lib/einstellungen.ts      Ortsgenauigkeit, Copyright
 src/components/Rahmen.tsx     Kopf- und Fußzeile
 src/lib/zugaenge.ts           die Adressen (Heimnetz, Tailscale, Web)
 ```

@@ -92,6 +92,12 @@ function masseKarte() {
   try { return JSON.parse(readFileSync(p, 'utf8')); } catch { return {}; }
 }
 
+/* ACHTUNG: Kamera, Zeitpunkt und Position kommen bewusst NICHT in
+   src/data/medien.json. Diese Datei landet im Bundle und waere damit
+   fuer jeden lesbar. Die Metadaten liegen verschluesselt in
+   public/medien/geheim.json und werden erst im Browser mit dem
+   Passwort aufgeschlossen (scripts/verschluesseln.mjs). */
+
 const masse = masseKarte();
 const daten = {
   /* Bewusst ohne Zeitstempel: der wuerde sich bei jedem Lauf aendern und
@@ -104,3 +110,6 @@ const daten = {
 mkdirSync(join(wurzel, 'src', 'data'), { recursive: true });
 writeFileSync(join(wurzel, 'src', 'data', 'medien.json'), JSON.stringify(daten, null, 2) + '\n');
 console.log(`[medien] ${daten.bilder.length} Bild(er), ${daten.videos.length} Video(s) gefunden.`);
+if (!existsSync(join(wurzel, 'public', 'medien', 'geheim.json'))) {
+  console.warn('[medien] Hinweis: geheim.json fehlt — Metadaten und Karte bleiben leer. `npm run verschluesseln`');
+}

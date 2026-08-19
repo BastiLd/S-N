@@ -32,10 +32,25 @@ externen Dienste — alle Animationen sind CSS und SVG.
 
 ## Bilder und Videos einbauen
 
-Originaldateien vom Handy nach `roh/` legen und einmal:
+**Der kurze Weg:** neue Dateien hier ablegen …
+
+```
+roh/bilder/    neue Fotos   (JPG, PNG, HEIC — Format egal)
+roh/videos/    neue Videos  (MOV, MP4, AVI — Format egal)
+```
+
+… und **`Hochladen.bat`** doppelklicken. Das war's. Das Skript rechnet
+um, prüft mit einem Probebau, committet, pusht, und GitHub baut die Seite
+neu. Bricht bei jedem Fehler ab, *bevor* etwas hochgeladen wird.
+
+Der Ordner `roh/` wird nicht mit eingecheckt — die Originale bleiben auf
+dem Rechner.
+
+Wer lieber selbst Hand anlegt:
 
 ```bash
-npm run aufbereiten
+npm run aufbereiten     # nur umrechnen
+npm run hochladen       # umrechnen + prüfen + pushen
 ```
 
 Ein anderer Quellordner geht auch:
@@ -137,3 +152,13 @@ src/components/Galerie.tsx    Galerie mit Lightbox
 src/components/Rahmen.tsx     Kopf- und Fußzeile
 src/lib/zugaenge.ts           die Adressen (Heimnetz, Tailscale, Web)
 ```
+
+---
+
+## Rechte
+
+© Bastian Klaus. Alle Rechte vorbehalten.
+
+Die Fotos und Videos auf der Gedenkseite sind private Aufnahmen und
+dürfen nicht ohne Rücksprache weiterverwendet werden. Für den Code gilt
+dasselbe, solange keine andere Lizenz danebensteht.

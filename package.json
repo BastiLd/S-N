@@ -11,7 +11,8 @@
     "aufbereiten": "node scripts/aufbereiten.mjs",
     "hochladen": "node scripts/hochladen.mjs",
     "exif": "node scripts/exif.mjs",
-    "verschluesseln": "node scripts/verschluesseln.mjs"
+    "verschluesseln": "node scripts/verschluesseln.mjs",
+    "immich": "node scripts/immich.mjs"
   },
   "dependencies": {
     "leaflet": "^1.9.4",

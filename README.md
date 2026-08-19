@@ -87,6 +87,24 @@ Dateien landen automatisch unter „Alles andere". Details in
 
 ---
 
+## Aus Immich holen
+
+Wenn die Bilder in Immich liegen, statt sie von Hand zu kopieren:
+
+```bash
+npm run immich -- "https://dein-immich/share/DERSCHLUESSEL"
+npm run immich -- "https://dein-immich/share/KEY" --passwort "geheim"
+```
+
+Lädt alle Originale aus der Freigabe nach `roh/bilder` bzw. `roh/videos`
+— danach wie immer `Hochladen.bat`. In Immich wird nur gelesen, nichts
+geändert.
+
+Der Link muss von diesem Rechner aus erreichbar sein: läuft Immich im
+Heimnetz, geht das nur von zu Hause oder über Tailscale.
+
+---
+
 ## Aufnahmedaten und Karte — mit Passwort
 
 Kamera, Zeitpunkt und Aufnahmeort stehen im Betrachter hinter dem

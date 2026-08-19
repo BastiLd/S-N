@@ -18,7 +18,7 @@ import { pfad } from '@/lib/pfad';
 import { type Stueck, sichtbarerOrt, koordinaten, metaSchluessel } from '@/lib/medien';
 import { ORTSGENAUIGKEIT, KARTEN_ZOOM } from '@/lib/einstellungen';
 import { useGeheimnis } from '@/lib/geheim';
-import { Betrachter } from './Betrachter';
+import { Betrachter } from './betrachter/Betrachter';
 import { Schloss } from './Schloss';
 import 'leaflet/dist/leaflet.css';
 

@@ -5,8 +5,8 @@
 
 import { useState } from 'react';
 import { pfad } from '@/lib/pfad';
-import { type Stueck, datumKurz, dauerText } from '@/lib/medien';
-import { Betrachter } from './Betrachter';
+import type { Stueck } from '@/lib/medien';
+import { Betrachter } from './betrachter/Betrachter';
 
 export type { Stueck };
 
@@ -20,8 +20,6 @@ function Kachel({ s, onOeffnen, eigenesMass = false }:
      das gibt saubere Reihen, und das ungeschnittene Bild ist ohnehin
      einen Klick entfernt. */
   const verhaeltnis = eigenesMass && s.breite && s.hoehe ? `${s.breite} / ${s.hoehe}` : undefined;
-  const datum = datumKurz(s.meta?.aufgenommen);
-  const laenge = s.art === 'video' ? dauerText(s.meta?.dauer) : null;
 
   return (
     <button
@@ -38,11 +36,10 @@ function Kachel({ s, onOeffnen, eigenesMass = false }:
           </svg>
         </span>
       )}
-      {laenge && <span className="stueck-dauer">{laenge}</span>}
-      <span className="stueck-text">
-        {s.text}
-        {datum && <span className="stueck-datum">{datum}</span>}
-      </span>
+      {/* Datum und Laenge stehen bewusst NICHT hier: sie gehoeren zu den
+          verschluesselten Aufnahmedaten und waeren im Raster fuer jeden
+          lesbar. Sie stehen in der Grossansicht hinter dem i-Knopf. */}
+      <span className="stueck-text">{s.text}</span>
     </button>
   );
 }

@@ -11,9 +11,17 @@
    des Schluessels benutzt; gespeichert wird ausschliesslich das
    Ergebnis, und das nur im sessionStorage (weg beim Schliessen des
    Tabs).
+
+   Der aufgeschlossene Zustand liegt in einem kleinen Speicher ausserhalb
+   von React und wird ueber useSyncExternalStore gelesen. Zwei Gruende:
+   auf der Seite gibt es mehrere Stellen mit Schloss (Karte und
+   Betrachter), und die sollen gemeinsam aufgehen — mit je eigenem
+   useState waere die eine offen und die andere weiter zu. Ausserdem
+   liefert der Server-Schnappschuss sauber `null`, sodass beim Hydrieren
+   nichts auseinanderlaeuft.
    ============================================================ */
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useSyncExternalStore } from 'react';
 import { pfad } from './pfad';
 import type { Meta } from './medien';
 
@@ -30,8 +38,41 @@ type Tresor = {
 
 const SPEICHER = 'sn_meta_offen';
 
-const vonB64 = (s: string) =>
-  Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+/* ---------- Speicher ausserhalb von React ---------- */
+let zwischenspeicher: Geheimnis | null | undefined;
+const hoerer = new Set<() => void>();
+
+function lesen(): Geheimnis | null {
+  if (zwischenspeicher !== undefined) return zwischenspeicher;
+  try {
+    const g = sessionStorage.getItem(SPEICHER);
+    zwischenspeicher = g ? (JSON.parse(g) as Geheimnis) : null;
+  } catch {
+    zwischenspeicher = null;   /* privater Modus o. Ä. */
+  }
+  return zwischenspeicher;
+}
+
+/* Auf dem Server gibt es keinen sessionStorage — und der Wert muss
+   stabil sein, sonst rendert React endlos. */
+const serverWert = () => null;
+
+function setzen(wert: Geheimnis | null) {
+  zwischenspeicher = wert;
+  try {
+    if (wert) sessionStorage.setItem(SPEICHER, JSON.stringify(wert));
+    else sessionStorage.removeItem(SPEICHER);
+  } catch { /* egal */ }
+  for (const f of hoerer) f();
+}
+
+function abonnieren(f: () => void) {
+  hoerer.add(f);
+  return () => { hoerer.delete(f); };
+}
+
+/* ---------- Entschluesseln ---------- */
+const vonB64 = (s: string) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
 
 async function entschluesseln(tresor: Tresor, passwort: string): Promise<Geheimnis> {
   const roh = await crypto.subtle.importKey(
@@ -49,28 +90,24 @@ async function entschluesseln(tresor: Tresor, passwort: string): Promise<Geheimn
   const klar = await crypto.subtle.decrypt(
     { name: 'AES-GCM', iv: vonB64(tresor.iv) }, schluessel, vonB64(tresor.inhalt),
   );
-  return JSON.parse(new TextDecoder().decode(klar));
+  return JSON.parse(new TextDecoder().decode(klar)) as Geheimnis;
 }
 
-/* ------------------------------------------------------------------
-   Hook: Zustand des Tresors und die Funktion zum Aufschliessen.
-   ------------------------------------------------------------------ */
+/* ---------- Hook ---------- */
 export function useGeheimnis() {
-  const [daten, setDaten] = useState<Geheimnis | null>(null);
+  const daten = useSyncExternalStore(abonnieren, lesen, serverWert);
   const [vorhanden, setVorhanden] = useState<boolean | null>(null);
   const [laeuft, setLaeuft] = useState(false);
   const [fehler, setFehler] = useState<string | null>(null);
 
-  /* Innerhalb einer Sitzung nur einmal fragen. */
+  /* Gibt es ueberhaupt etwas zum Aufschliessen? Die Antwort kommt aus
+     einem Callback, nicht aus dem Rumpf des Effekts. */
   useEffect(() => {
-    try {
-      const g = sessionStorage.getItem(SPEICHER);
-      if (g) setDaten(JSON.parse(g));
-    } catch { /* privater Modus o. Ä. */ }
-
+    let lebt = true;
     fetch(pfad('/medien/geheim.json'), { method: 'HEAD' })
-      .then((a) => setVorhanden(a.ok))
-      .catch(() => setVorhanden(false));
+      .then((a) => { if (lebt) setVorhanden(a.ok); })
+      .catch(() => { if (lebt) setVorhanden(false); });
+    return () => { lebt = false; };
   }, []);
 
   const aufschliessen = useCallback(async (passwort: string) => {
@@ -80,9 +117,7 @@ export function useGeheimnis() {
       const antwort = await fetch(pfad('/medien/geheim.json'));
       if (!antwort.ok) throw new Error('nicht gefunden');
       const tresor: Tresor = await antwort.json();
-      const g = await entschluesseln(tresor, passwort);
-      setDaten(g);
-      try { sessionStorage.setItem(SPEICHER, JSON.stringify(g)); } catch { /* egal */ }
+      setzen(await entschluesseln(tresor, passwort));
       return true;
     } catch {
       setFehler('Passwort stimmt nicht.');
@@ -92,10 +127,7 @@ export function useGeheimnis() {
     }
   }, []);
 
-  const abschliessen = useCallback(() => {
-    setDaten(null);
-    try { sessionStorage.removeItem(SPEICHER); } catch { /* egal */ }
-  }, []);
+  const abschliessen = useCallback(() => setzen(null), []);
 
   return { daten, offen: daten !== null, vorhanden, laeuft, fehler, aufschliessen, abschliessen };
 }

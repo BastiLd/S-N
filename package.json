@@ -1,0 +1,23 @@
+{
+  "name": "s-n-pages",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "medien": "node scripts/medien.mjs",
+    "dev": "npm run medien && next dev",
+    "build": "npm run medien && next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "next": "16.2.6",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "typescript": "^5"
+  }
+}

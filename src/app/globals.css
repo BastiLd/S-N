@@ -1,0 +1,560 @@
+/* ============================================================
+   S-N — Simba & Nala
+   Landing (Sturm, der aufklart) + Gedenkseite (Nachthimmel)
+   Reines CSS, keine Bibliothek — laeuft so auf GitHub Pages.
+   ============================================================ */
+
+:root {
+  /* Tag / Landing */
+  --sturm-0: #101d33;
+  --sturm-1: #1b3a52;
+  --sturm-2: #2f6b6c;
+  --warm-0:  #e79b58;
+  --warm-1:  #f6cf94;
+  --sonne:   #ffe6b8;
+
+  /* Marke (wie VetNow) */
+  --teal-400: #35c9b8;
+  --teal-500: #19b3a4;
+  --teal-600: #0c7d72;
+  --teal-700: #0a625c;
+
+  /* Nacht / Gedenken */
+  --nacht-0: #06091a;
+  --nacht-1: #101736;
+  --nacht-2: #271c4c;
+  --nacht-3: #3c2a5e;
+  --gold:    #f6c97a;
+  --gold-2:  #ffe3ad;
+
+  /* Schrift */
+  --ink:    #0e1a1c;
+  --ink-2:  #3d5254;
+  --ink-3:  #6d8385;
+  --hell:   #f3f8f7;
+  --hell-2: #cfe0dd;
+  --hell-3: #9fb5b6;
+
+  --papier:   #f4f8f7;
+  --papier-2: #ffffff;
+
+  --r-sm: 10px;
+  --r-md: 16px;
+  --r-lg: 24px;
+  --r-xl: 34px;
+  --r-pill: 999px;
+
+  --breite: 1120px;
+  --schmal: 720px;
+
+  --font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  background: var(--papier);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+a { color: inherit; }
+img, video { max-width: 100%; display: block; }
+
+/* ---------- Grundbausteine ---------- */
+.wrap { width: 100%; max-width: var(--breite); margin: 0 auto; padding: 0 22px; }
+.wrap-schmal { max-width: var(--schmal); }
+
+.eyebrow {
+  font-size: 12.5px; font-weight: 700; letter-spacing: .16em;
+  text-transform: uppercase; opacity: .85;
+}
+
+h1, h2, h3 { margin: 0; letter-spacing: -.025em; text-wrap: balance; }
+h1 { font-size: clamp(38px, 7.4vw, 76px); line-height: 1.02; font-weight: 800; }
+h2 { font-size: clamp(26px, 4vw, 40px); line-height: 1.12; font-weight: 750; }
+h3 { font-size: clamp(18px, 2.2vw, 22px); line-height: 1.25; font-weight: 700; }
+p  { margin: 0; line-height: 1.65; text-wrap: pretty; }
+
+.lead { font-size: clamp(16.5px, 2vw, 20px); line-height: 1.6; }
+
+/* Knoepfe */
+.btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 15px 26px; border-radius: var(--r-pill);
+  font-size: 15.5px; font-weight: 650; text-decoration: none;
+  border: 1px solid transparent; cursor: pointer;
+  transition: transform .16s ease, box-shadow .16s ease,
+              background .16s ease, border-color .16s ease;
+}
+.btn:hover { transform: translateY(-2px); }
+.btn:focus-visible { outline: 3px solid var(--teal-400); outline-offset: 3px; }
+
+.btn-primary {
+  background: linear-gradient(140deg, var(--teal-500), var(--teal-700));
+  color: #fff; box-shadow: 0 10px 30px rgba(10, 98, 92, .38);
+}
+.btn-primary:hover { box-shadow: 0 16px 40px rgba(10, 98, 92, .5); }
+
+.btn-glas {
+  background: rgba(255, 255, 255, .12); color: var(--hell);
+  border-color: rgba(255, 255, 255, .3);
+  backdrop-filter: blur(10px) saturate(1.3);
+}
+.btn-glas:hover { background: rgba(255, 255, 255, .2); }
+
+.btn-gold {
+  background: linear-gradient(140deg, var(--gold-2), var(--gold));
+  color: #3a2708; box-shadow: 0 10px 30px rgba(246, 201, 122, .3);
+}
+
+.btn-klein { padding: 11px 18px; font-size: 14px; }
+
+/* ============================================================
+   HERO — Sturm, der aufklart
+   ============================================================ */
+.szene {
+  position: relative;
+  min-height: min(96svh, 900px);
+  display: flex; align-items: center;
+  overflow: hidden;
+  isolation: isolate;
+  color: var(--hell);
+}
+
+/* Die Wolken ziehen hinter dem Text durch und fressen sonst den Kontrast.
+   Dieser Schleier liegt zwischen Wolken und Text und wird nach rechts
+   durchsichtig — die helle Seite des Bildes bleibt hell. */
+.szene::after {
+  content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: linear-gradient(96deg,
+    rgba(7, 20, 32, .68) 0%, rgba(7, 20, 32, .5) 32%,
+    rgba(7, 20, 32, .16) 54%, rgba(7, 20, 32, 0) 68%);
+}
+
+/* Himmel: links Sturm, rechts Morgenlicht */
+.szene-himmel {
+  position: absolute; inset: 0; z-index: -5;
+  background:
+    radial-gradient(120% 90% at 82% 84%, var(--warm-1) 0%, rgba(246,207,148,0) 46%),
+    radial-gradient(90% 70% at 88% 92%, var(--sonne) 0%, rgba(255,230,184,0) 40%),
+    linear-gradient(168deg, var(--sturm-0) 0%, var(--sturm-1) 38%,
+                    var(--sturm-2) 66%, var(--warm-0) 100%);
+}
+
+/* Lichtschein von rechts unten */
+.szene-licht {
+  position: absolute; right: -8%; bottom: -18%; z-index: -4;
+  width: 78vw; height: 78vw; max-width: 900px; max-height: 900px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 233, 190, .55), rgba(255, 233, 190, 0) 62%);
+  filter: blur(18px);
+  animation: atmen 11s ease-in-out infinite;
+}
+@keyframes atmen {
+  0%, 100% { transform: scale(1);    opacity: .78; }
+  50%      { transform: scale(1.09); opacity: 1; }
+}
+
+/* Regenschleier nur ueber der Sturmhaelfte */
+.regen {
+  position: absolute; inset: 0; z-index: -3; pointer-events: none;
+  opacity: .3;
+  -webkit-mask-image: linear-gradient(100deg, #000 0%, #000 26%, transparent 62%);
+          mask-image: linear-gradient(100deg, #000 0%, #000 26%, transparent 62%);
+}
+.regen span {
+  position: absolute; top: -22%;
+  width: 1.5px; height: 92px;
+  background: linear-gradient(180deg, rgba(255,255,255,0), rgba(214,238,255,.85));
+  border-radius: 2px;
+  animation: faellt linear infinite;
+}
+@keyframes faellt {
+  from { transform: translate3d(0, -30vh, 0) rotate(11deg); }
+  to   { transform: translate3d(-9vw, 128vh, 0) rotate(11deg); }
+}
+
+/* Wolkenbaender */
+.wolken { position: absolute; inset: 0; z-index: -2; pointer-events: none; overflow: hidden; }
+.wolken-band { position: absolute; left: 0; width: 260%; display: flex; }
+.wolken-band svg { flex: none; width: 50%; height: auto; }
+.wolken-band.fern  { top: 5%;  opacity: .3;  filter: blur(3px); animation: zieht 132s linear infinite; }
+.wolken-band.mitte { top: 22%; opacity: .5;  filter: blur(1px); animation: zieht  84s linear infinite; }
+.wolken-band.nah   { top: 46%; opacity: .34;                    animation: zieht  52s linear infinite reverse; }
+@keyframes zieht { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(-50%, 0, 0); } }
+
+/* Huegel-Silhouette unten */
+.huegel { position: absolute; left: 0; right: 0; bottom: -1px; z-index: 0; pointer-events: none; }
+.huegel svg { width: 100%; height: auto; display: block; }
+
+/* Hero-Inhalt */
+.hero-inhalt { position: relative; z-index: 1; padding: 116px 0 132px; width: 100%; }
+.hero-grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: 46px; align-items: center; }
+@media (max-width: 900px) { .hero-grid { grid-template-columns: 1fr; gap: 30px; } }
+
+.hero-titel { text-shadow: 0 2px 30px rgba(6, 18, 26, .45); }
+.hero-titel .zeile-2 {
+  display: block;
+  background: linear-gradient(100deg, #ffffff 4%, var(--sonne) 34%, var(--teal-400) 88%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.hero-lead { margin-top: 22px; max-width: 42ch; color: var(--hell-2); }
+.hero-knoepfe { margin-top: 34px; display: flex; flex-wrap: wrap; gap: 13px; }
+
+.hero-notiz {
+  margin-top: 26px; font-size: 13.5px; color: var(--hell-2);
+  display: flex; align-items: center; gap: 9px; flex-wrap: wrap;
+}
+.punkt { width: 7px; height: 7px; border-radius: 50%; background: var(--teal-400); flex: none;
+         box-shadow: 0 0 0 5px rgba(53, 201, 184, .18); }
+
+/* ============================================================
+   Tornado (Comic)
+   ============================================================ */
+.tornado-buehne { position: relative; display: grid; place-items: center; min-height: 400px; }
+.tornado { width: min(100%, 380px); height: auto; overflow: visible; }
+@media (max-width: 900px) {
+  .tornado-buehne { min-height: 250px; }
+  .tornado { width: min(62%, 230px); }
+}
+.t-band { transform-box: fill-box; transform-origin: center; animation: wirbelt 3.4s ease-in-out infinite; }
+.t-band.b1 { animation-duration: 2.6s; }
+.t-band.b2 { animation-duration: 2.9s; animation-delay: -.3s; }
+.t-band.b3 { animation-duration: 3.2s; animation-delay: -.6s; }
+.t-band.b4 { animation-duration: 3.5s; animation-delay: -.9s; }
+.t-band.b5 { animation-duration: 3.8s; animation-delay: -1.2s; }
+.t-band.b6 { animation-duration: 4.1s; animation-delay: -1.5s; }
+.t-band.b7 { animation-duration: 4.4s; animation-delay: -1.8s; }
+@keyframes wirbelt {
+  0%, 100% { transform: scaleX(1)    translateX(0); }
+  50%      { transform: scaleX(1.14) translateX(-6px); }
+}
+.tornado-huelle { animation: schwankt 6.5s ease-in-out infinite; transform-origin: 50% 100%; }
+@keyframes schwankt {
+  0%, 100% { transform: rotate(-2.2deg); }
+  50%      { transform: rotate(2.2deg); }
+}
+
+/* Was im Wirbel mitfliegt */
+.fliegt { transform-box: fill-box; transform-origin: center; }
+.fliegt-1 { animation: kreist 5.2s linear infinite; }
+.fliegt-2 { animation: kreist 6.8s linear infinite reverse; }
+.fliegt-3 { animation: kreist 4.4s linear infinite; }
+.fliegt-4 { animation: kreist 7.6s linear infinite reverse; }
+@keyframes kreist {
+  from { transform: rotate(0deg)   translateX(84px) rotate(0deg); }
+  to   { transform: rotate(360deg) translateX(84px) rotate(-360deg); }
+}
+
+/* ============================================================
+   Abschnitte auf hellem Grund
+   ============================================================ */
+.abschnitt { padding: clamp(64px, 9vw, 118px) 0; }
+.abschnitt-kopf { max-width: 62ch; }
+.abschnitt-kopf .eyebrow { color: var(--teal-600); }
+.abschnitt-kopf h2 { margin-top: 12px; color: var(--ink); }
+.abschnitt-kopf p  { margin-top: 16px; color: var(--ink-2); }
+
+.karten { display: grid; grid-template-columns: repeat(auto-fit, minmax(258px, 1fr)); gap: 20px; margin-top: 44px; }
+
+.karte {
+  position: relative; overflow: hidden;
+  background: var(--papier-2);
+  border: 1px solid rgba(14, 26, 28, .09);
+  border-radius: var(--r-lg);
+  padding: 28px 26px 26px;
+  box-shadow: 0 2px 4px rgba(14, 26, 28, .04), 0 14px 34px rgba(14, 26, 28, .05);
+  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.karte:hover {
+  transform: translateY(-4px);
+  border-color: rgba(12, 125, 114, .3);
+  box-shadow: 0 4px 8px rgba(14, 26, 28, .05), 0 24px 54px rgba(12, 125, 114, .14);
+}
+.karte-marke {
+  width: 46px; height: 46px; border-radius: 14px;
+  display: grid; place-items: center; color: #fff;
+  background: linear-gradient(145deg, var(--teal-500), var(--teal-700));
+  box-shadow: 0 6px 18px rgba(12, 125, 114, .3);
+}
+.karte h3 { margin-top: 18px; color: var(--ink); }
+.karte p  { margin-top: 9px; color: var(--ink-2); font-size: 14.8px; }
+.karte-fuss { margin-top: 18px; font-size: 13.5px; font-weight: 650; color: var(--teal-600); }
+.karte code {
+  font-size: 12.5px; background: rgba(12, 125, 114, .08);
+  padding: 2px 7px; border-radius: 6px; color: var(--teal-700);
+}
+
+/* Zugangs-Kacheln (ZimaOS) */
+.zugaenge { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; margin-top: 40px; }
+.zugang {
+  display: flex; gap: 16px; align-items: flex-start;
+  padding: 24px; border-radius: var(--r-lg);
+  background: linear-gradient(150deg, #0f2a2f, #123c3c);
+  color: var(--hell); text-decoration: none;
+  border: 1px solid rgba(53, 201, 184, .22);
+  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.zugang:hover {
+  transform: translateY(-4px); border-color: var(--teal-400);
+  box-shadow: 0 22px 50px rgba(10, 60, 60, .35);
+}
+.zugang-ic { flex: none; width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center;
+             background: rgba(53, 201, 184, .16); color: var(--teal-400); }
+.zugang h3 { font-size: 17px; }
+.zugang p  { margin-top: 6px; font-size: 14px; color: var(--hell-3); }
+.zugang .adresse {
+  margin-top: 10px; font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 12.5px; color: var(--teal-400); word-break: break-all;
+}
+
+.hinweis {
+  margin-top: 26px; padding: 16px 20px; border-radius: var(--r-md);
+  background: rgba(12, 125, 114, .07);
+  border-left: 3px solid var(--teal-600);
+  font-size: 14px; color: var(--ink-2);
+}
+.hinweis code {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 12.8px; background: rgba(12, 125, 114, .1);
+  padding: 2px 6px; border-radius: 5px;
+}
+
+/* ============================================================
+   Bruecke zur Gedenkseite
+   ============================================================ */
+.bruecke {
+  position: relative; overflow: hidden; isolation: isolate;
+  padding: clamp(78px, 11vw, 140px) 0;
+  background: linear-gradient(180deg, var(--nacht-2) 0%, var(--nacht-1) 55%, var(--nacht-0) 100%);
+  color: var(--hell);
+  text-align: center;
+}
+.bruecke-inhalt { position: relative; z-index: 1; }
+.bruecke h2 { color: var(--gold-2); }
+.bruecke p  { margin: 18px auto 0; max-width: 54ch; color: var(--hell-3); }
+.bruecke .btn { margin-top: 34px; }
+.bruecke-sterne { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+
+/* ============================================================
+   Kopf- und Fusszeile
+   ============================================================ */
+.kopf {
+  position: sticky; top: 0; z-index: 50;
+  display: flex; align-items: center; gap: 16px;
+  padding: 14px 22px;
+  background: rgba(6, 15, 20, .74);
+  backdrop-filter: blur(14px) saturate(1.5);
+  border-bottom: 1px solid rgba(255, 255, 255, .09);
+  color: var(--hell);
+}
+.kopf-marke { display: flex; align-items: center; gap: 11px; text-decoration: none; color: inherit; margin-right: auto; }
+.kopf-marke .mark {
+  width: 36px; height: 36px; border-radius: 11px; flex: none; display: grid; place-items: center;
+  background: linear-gradient(145deg, var(--teal-400), var(--teal-700)); color: #fff;
+  box-shadow: 0 6px 16px rgba(12, 125, 114, .4);
+}
+.kopf-marke .name { display: block; font-weight: 800; font-size: 17px; letter-spacing: -.02em; }
+.kopf-marke .sub  { display: block; font-size: 11.5px; color: var(--hell-3); margin-top: 1px; }
+.kopf nav { display: flex; align-items: center; gap: 6px; }
+.kopf nav a {
+  padding: 9px 15px; border-radius: var(--r-pill); text-decoration: none;
+  font-size: 14px; font-weight: 600; color: var(--hell-2);
+  transition: background .15s ease, color .15s ease;
+}
+.kopf nav a:hover { background: rgba(255, 255, 255, .12); color: #fff; }
+.kopf nav a.aktiv { background: rgba(53, 201, 184, .2); color: var(--teal-400); }
+@media (max-width: 620px) {
+  .kopf { padding: 12px 16px; gap: 10px; }
+  .kopf-marke .sub { display: none; }
+  .kopf nav a { padding: 8px 11px; font-size: 13px; }
+}
+
+.fuss { background: var(--nacht-0); color: var(--hell-3); padding: 54px 0 42px; font-size: 14px; }
+.fuss-grid { display: flex; flex-wrap: wrap; gap: 26px; justify-content: space-between; align-items: flex-start; }
+.fuss a { color: var(--hell-2); text-decoration: none; }
+.fuss a:hover { color: var(--teal-400); text-decoration: underline; }
+.fuss ul { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 8px; }
+.fuss .titel { color: var(--hell); font-weight: 700; font-size: 14.5px; }
+.fuss-unten { margin-top: 34px; padding-top: 22px; border-top: 1px solid rgba(255,255,255,.09); font-size: 13px; }
+
+/* ============================================================
+   GEDENKSEITE
+   ============================================================ */
+.nacht {
+  position: relative; isolation: isolate; overflow: hidden;
+  background: linear-gradient(178deg, var(--nacht-0) 0%, var(--nacht-1) 34%,
+                              var(--nacht-2) 68%, var(--nacht-3) 100%);
+  color: var(--hell);
+}
+.nacht-sterne { position: absolute; inset: 0; z-index: -3; pointer-events: none; }
+.nacht-mond {
+  position: absolute; top: 8%; right: 11%; z-index: -2;
+  width: clamp(90px, 15vw, 168px); aspect-ratio: 1; border-radius: 50%;
+  background: radial-gradient(circle at 34% 32%, #fffdf6, #f3e6c4 58%, #d9c69b 100%);
+  box-shadow: 0 0 70px 26px rgba(255, 243, 214, .18), 0 0 160px 70px rgba(255, 235, 190, .09);
+}
+/* Auf schmalen Schirmen sass der Mond hinter dem Einleitungstext —
+   heller Kreis unter weisser Schrift. Er rueckt deshalb in die freie
+   Ecke ueber der Ueberschrift. */
+@media (max-width: 760px) {
+  .nacht-mond { top: 1.5%; right: 5%; width: clamp(56px, 17vw, 84px); }
+}
+
+.nacht-wolken { position: absolute; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+.nacht-wolken .wolken-band.fern  { top: 12%; opacity: .09; filter: blur(16px); animation-duration: 170s; }
+.nacht-wolken .wolken-band.mitte { top: 34%; opacity: .07; filter: blur(11px); animation-duration: 124s; }
+
+.gedenk-hero { position: relative; z-index: 1; padding: clamp(74px, 11vw, 130px) 0 clamp(50px, 7vw, 84px); text-align: center; }
+.gedenk-hero .eyebrow { color: var(--gold); }
+.gedenk-hero h1 {
+  margin-top: 16px;
+  background: linear-gradient(100deg, var(--gold-2), #fff 42%, var(--gold) 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.gedenk-hero .lead { margin: 22px auto 0; max-width: 50ch; color: var(--hell-2); }
+
+/* Sternbilder */
+.sternbilder { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 54px; }
+@media (max-width: 760px) { .sternbilder { grid-template-columns: 1fr; } }
+.sternbild {
+  position: relative; padding: 30px 26px 26px; border-radius: var(--r-xl);
+  background: rgba(255, 255, 255, .045);
+  border: 1px solid rgba(255, 255, 255, .11);
+  backdrop-filter: blur(8px);
+  text-align: center;
+  transition: transform .25s ease, border-color .25s ease, background .25s ease;
+}
+.sternbild:hover { transform: translateY(-5px); border-color: rgba(246, 201, 122, .42); background: rgba(255,255,255,.07); }
+.sternbild svg { width: 100%; max-width: 240px; height: auto; margin: 0 auto; }
+.sternbild .sb-name {
+  margin-top: 16px; font-size: clamp(24px, 3.4vw, 32px); font-weight: 750;
+  letter-spacing: .04em; color: var(--gold-2);
+}
+.sternbild .sb-text { margin-top: 8px; font-size: 14.5px; color: var(--hell-3); }
+
+.sb-stern { animation: funkelt 3.6s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes funkelt {
+  0%, 100% { opacity: .55; transform: scale(.86); }
+  50%      { opacity: 1;   transform: scale(1.14); }
+}
+.sb-linie { stroke-dasharray: 4 6; animation: laeuft 22s linear infinite; }
+@keyframes laeuft { to { stroke-dashoffset: -200; } }
+
+/* Widmung */
+.widmung { position: relative; z-index: 1; margin: clamp(58px, 8vw, 96px) auto 0; max-width: 60ch; text-align: center; }
+.widmung p { font-size: clamp(17px, 2.2vw, 21px); line-height: 1.8; color: var(--hell-2); }
+.widmung p + p { margin-top: 20px; }
+.widmung .kerze { display: block; margin: 0 auto 32px; }
+.flamme { transform-box: fill-box; transform-origin: 50% 100%; animation: flackert 2.4s ease-in-out infinite; }
+@keyframes flackert {
+  0%, 100% { transform: scale(1) rotate(-1.5deg);       opacity: .95; }
+  35%      { transform: scale(1.09, .95) rotate(2deg);  opacity: 1; }
+  70%      { transform: scale(.95, 1.07) rotate(-2deg); opacity: .9; }
+}
+
+/* Galerie */
+.galerie-kopf { position: relative; z-index: 1; margin-top: clamp(66px, 9vw, 110px); text-align: center; }
+.galerie-kopf .eyebrow { color: var(--gold); }
+.galerie-kopf h2 { margin-top: 12px; color: var(--hell); }
+.galerie-kopf p  { margin: 14px auto 0; max-width: 52ch; color: var(--hell-3); }
+
+.galerie {
+  position: relative; z-index: 1;
+  margin-top: 40px; padding-bottom: clamp(70px, 10vw, 120px);
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(232px, 1fr));
+  gap: 16px;
+}
+.stueck {
+  position: relative; overflow: hidden; border-radius: var(--r-lg);
+  border: 1px solid rgba(255, 255, 255, .12);
+  background: rgba(255, 255, 255, .04);
+  aspect-ratio: 4 / 3;
+  cursor: zoom-in; padding: 0; display: block; width: 100%; text-align: left;
+  transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+}
+.stueck:hover { transform: translateY(-4px) scale(1.012); border-color: rgba(246,201,122,.5);
+                box-shadow: 0 24px 54px rgba(0, 0, 0, .45); }
+.stueck:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+.stueck img, .stueck video { width: 100%; height: 100%; object-fit: cover; }
+.stueck-text {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  padding: 26px 15px 13px; font-size: 13.5px; font-weight: 600; color: #fff;
+  background: linear-gradient(180deg, rgba(6, 9, 26, 0), rgba(6, 9, 26, .88));
+}
+.stueck-play {
+  position: absolute; top: 12px; right: 12px;
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(6, 9, 26, .6); backdrop-filter: blur(6px);
+  display: grid; place-items: center; color: #fff;
+}
+.stueck.gross { grid-column: span 2; aspect-ratio: 16 / 10; }
+@media (max-width: 560px) { .stueck.gross { grid-column: span 1; aspect-ratio: 4 / 3; } }
+
+/* Leerer Zustand */
+.leer {
+  position: relative; z-index: 1;
+  margin-top: 40px; margin-bottom: clamp(70px, 10vw, 120px);
+  padding: clamp(40px, 6vw, 66px) 30px;
+  border-radius: var(--r-xl); text-align: center;
+  border: 1.5px dashed rgba(246, 201, 122, .38);
+  background: rgba(255, 255, 255, .035);
+}
+.leer h3 { color: var(--gold-2); }
+.leer p  { margin: 12px auto 0; max-width: 48ch; color: var(--hell-3); font-size: 15px; }
+.leer .pfad {
+  display: inline-block; margin-top: 20px; padding: 11px 18px; border-radius: var(--r-md);
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 13.5px; color: var(--gold-2);
+  background: rgba(6, 9, 26, .45); border: 1px solid rgba(246, 201, 122, .26);
+}
+
+/* Lightbox */
+.lb {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(4, 6, 16, .93); backdrop-filter: blur(12px);
+  display: grid; place-items: center; padding: 26px;
+  animation: lb-auf .18s ease;
+}
+@keyframes lb-auf { from { opacity: 0; } to { opacity: 1; } }
+.lb-inhalt { max-width: min(1100px, 94vw); max-height: 86vh; text-align: center; }
+.lb-inhalt img, .lb-inhalt video { max-height: 76vh; width: auto; margin: 0 auto; border-radius: var(--r-md);
+                                   box-shadow: 0 30px 90px rgba(0, 0, 0, .6); }
+.lb-text { margin-top: 16px; color: var(--hell-2); font-size: 15px; }
+.lb-zu {
+  position: absolute; top: 18px; right: 18px;
+  width: 46px; height: 46px; border-radius: 50%; cursor: pointer;
+  background: rgba(255, 255, 255, .12); border: 1px solid rgba(255,255,255,.24);
+  color: #fff; display: grid; place-items: center;
+}
+.lb-zu:hover { background: rgba(255, 255, 255, .22); }
+.lb-pfeil {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 50px; height: 50px; border-radius: 50%; cursor: pointer;
+  background: rgba(255, 255, 255, .1); border: 1px solid rgba(255,255,255,.2);
+  color: #fff; display: grid; place-items: center;
+}
+.lb-pfeil:hover { background: rgba(255, 255, 255, .2); }
+.lb-pfeil.links { left: 16px; }
+.lb-pfeil.rechts { right: 16px; }
+@media (max-width: 620px) { .lb-pfeil { width: 42px; height: 42px; } .lb-pfeil.links { left: 8px; } .lb-pfeil.rechts { right: 8px; } }
+
+/* ============================================================
+   Wer weniger Bewegung moechte, bekommt weniger Bewegung.
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+  .regen { display: none; }
+}

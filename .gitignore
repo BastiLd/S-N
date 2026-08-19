@@ -1,0 +1,32 @@
+# Abhängigkeiten
+node_modules/
+.pnp
+.pnp.*
+
+# Build-Ergebnisse
+dist/
+build/
+out/
+.next/
+*.tsbuildinfo
+next-env.d.ts
+
+# Expo / Android
+.expo/
+android/
+ios/
+*.apk
+*.aab
+*.keystore
+!debug.keystore
+
+# Umgebung & Geheimnisse
+.env
+.env.*
+!.env.example
+
+# Betriebssystem / Editor
+.DS_Store
+Thumbs.db
+*.log
+npm-debug.log*

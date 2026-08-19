@@ -26,7 +26,11 @@ const wurzel = join(dirname(fileURLToPath(import.meta.url)), '..');
 const ROH = join(wurzel, 'roh');
 const BRANCH = 'pages';
 
-const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+/* Nicht ueber npm aufrufen: Node 20+ verweigert das Starten von
+   .cmd-Dateien ohne Shell (EINVAL). Die Skripte laufen direkt mit
+   derselben node-Binary, die dieses Skript ausfuehrt. */
+const NODE = process.execPath;
+const NEXT = join(wurzel, 'node_modules', 'next', 'dist', 'bin', 'next');
 
 function schritt(nr, text) {
   console.log(`\n\x1b[36m[${nr}/5]\x1b[0m ${text}`);
@@ -59,20 +63,16 @@ console.log(`${neu} neue Datei(en) in roh/ gefunden.`);
 
 /* --- 1. Aufbereiten ---------------------------------------------- */
 schritt(1, 'Fotos und Videos fuers Web umrechnen …');
-if (neu > 0) {
-  lauf(npm, ['run', 'aufbereiten']);
-} else {
-  console.log('   roh/ ist leer — nichts umzurechnen. (Masse werden trotzdem geprueft.)');
-  lauf(npm, ['run', 'aufbereiten']);
-}
+if (neu === 0) console.log('   roh/ ist leer — es wird nur nachgetragen, was schon da ist.');
+lauf(NODE, [join(wurzel, 'scripts', 'aufbereiten.mjs')]);
 
 /* --- 2. Medienliste ---------------------------------------------- */
 schritt(2, 'Medienliste schreiben …');
-lauf(npm, ['run', 'medien']);
+lauf(NODE, [join(wurzel, 'scripts', 'medien.mjs')]);
 
 /* --- 3. Probebau -------------------------------------------------- */
 schritt(3, 'Probebau — damit nichts Kaputtes gepusht wird …');
-lauf(npm, ['run', 'build'], { env: { ...process.env, NEXT_PUBLIC_BASE_PATH: '/S-N' } });
+lauf(NODE, [NEXT, 'build'], { env: { ...process.env, NEXT_PUBLIC_BASE_PATH: '/S-N' } });
 /* Das Ergebnis brauchen wir lokal nicht; GitHub baut selbst neu. */
 rmSync(join(wurzel, 'out'), { recursive: true, force: true });
 

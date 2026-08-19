@@ -94,7 +94,9 @@ function masseKarte() {
 
 const masse = masseKarte();
 const daten = {
-  erzeugt: new Date().toISOString(),
+  /* Bewusst ohne Zeitstempel: der wuerde sich bei jedem Lauf aendern und
+     `npm run hochladen` wuerde dadurch auch dann committen und pushen,
+     wenn gar keine neue Datei dazugekommen ist. */
   bilder: lies('bilder', BILD, 'bild', vorschauKarte('bilder'), masse),
   videos: lies('videos', VIDEO, 'video', vorschauKarte('videos'), masse),
 };
